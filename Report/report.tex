@@ -1,0 +1,172 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Structured General Purpose Assignment
+% LaTeX Template
+%
+% This template has been downloaded from:
+% http://www.latextemplates.com
+%
+% Original author:
+% Ted Pavlic (http://www.tedpavlic.com)
+%
+% Note:
+% The \lipsum[#] commands throughout this template generate dummy text
+% to fill the template out. These commands should all be removed when
+% writing assignment content.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass{article}
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{4}
+\usepackage{fancyhdr} % Required for custom headers
+\usepackage{lastpage} % Required to determine the last page for the footer
+\usepackage{extramarks} % Required for headers and footers
+\usepackage{graphicx} % Required to insert images
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{arydshln}
+\usepackage{mathtools}
+\usepackage{breqn}
+
+% Margins
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=6.5in
+\textheight=9.0in
+\headsep=0.25in
+
+\linespread{1.1} % Line spacing
+
+% Set up the header and footer
+\pagestyle{fancy}
+\lhead{\hmwkClass\ : \hmwkTitle} % Top center header
+\rhead{\firstxmark} % Top right header
+\lfoot{\lastxmark} % Bottom left footer
+\cfoot{} % Bottom center footer
+\rfoot{Page\ \thepage\ } % Bottom right footer
+\renewcommand\headrulewidth{0.4pt} % Size of the header rule
+\renewcommand\footrulewidth{0.4pt} % Size of the footer rule
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+%----------------------------------------------------------------------------------------
+%	NAME AND CLASS SECTION
+%----------------------------------------------------------------------------------------
+
+\newcommand{\hmwkTitle}{Kalman Filtering for an Inverted Pendulum Proposal} % Assignment title
+\newcommand{\hmwkDueDate}{Wednesday,\ May\ 9,\ 2018} % Due date
+\newcommand{\hmwkClass}{MAE\ 298} % Course/class
+\newcommand{\hmwkClassTime}{} % Class/lecture time
+\newcommand{\hmwkClassInstructor}{Professor Lin} % Teacher/lecturer
+\newcommand{\hmwkAuthorName}{Jordan McCrone, Sarah O'Meara, Peng Chen} % Your name
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\title{
+\vspace{2in}
+\textmd{\textbf{\hmwkClass:\ \hmwkTitle}}\\
+\normalsize\vspace{0.1in}\large{Due\ on\ \hmwkDueDate}\\
+\vspace{0.1in}\large{\textit{\hmwkClassInstructor\ \hmwkClassTime}}
+\vspace{3in}
+}
+
+\author{\textbf{\hmwkAuthorName}}
+\date{} % Insert date here if you want it to appear below your name
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle
+
+%----------------------------------------------------------------------------------------
+%	TABLE OF CONTENTS
+%----------------------------------------------------------------------------------------
+
+%\setcounter{tocdepth}{1} % Uncomment this line if you don't want subsections listed in the ToC
+
+\newpage
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
+
+
+\section{Introduction}
+
+Example superscript JACO\textsuperscript{2} Example citation \cite{weisz2017assistive}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=5cm,keepaspectratio]{kinova.png}
+	\caption{JACO\textsuperscript{2} 6-DOF Manipulator}
+	\label{fig:diagram1}
+\end{figure}
+
+Example Figure \ref{fig:diagram1} Example symbols $\epsilon$. Example table
+
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{ |c |c  |c |c |c  |c  |c |}
+\hline
+	 i & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
+	 a\textsubscript{i} & 0 & d\textsubscript{2} & 0 & 0 & 0 & 0 \\ \hline
+	 $\alpha$\textsubscript{i}  & -90 & 0 & -90 & 90 & -90 & 0 \\ \hline
+	 $\theta$\textsubscript{i} & $\theta$\textsubscript{1} & $\theta$\textsubscript{2} & $\theta$\textsubscript{3} & $\theta$\textsubscript{4} & $\theta$\textsubscript{5} & $\theta$\textsubscript{6} \\ \hline
+	 s\textsubscript{i} & -d\textsubscript{1} & 0 & $\epsilon$\ &  d\textsubscript{3} + d\textsubscript{4} & 0 & d\textsubscript{5} + d\textsubscript{6} \\ \hline
+\end{tabular}
+\caption{D-H Parameters}
+\label{table:1}
+\end{table}
+
+Example equation
+
+\begin{equation}
+A\textsubscript{i} = 
+\begin{bmatrix}
+	C\theta_{i} & -S\theta_{i}C\alpha_{i} & S\theta_{i}S\alpha_{i} & a_{i}C\theta{i} \\
+	S\theta_{i} & C\theta_{i}C\alpha_{i} & -C\theta_{i}S\alpha_{i} & a_{i}S\theta{i}  \\
+	0 & S\alpha_{i} & C\alpha_{i} & s_{i} \\
+	0 & 0 & 0 & 1 \\
+\end{bmatrix}
+\label{aMatrix}
+\end{equation}
+
+Example matrix
+
+\[
+A_{1} = 
+\begin{bmatrix}
+	C\theta_{1} & 0 & -S\theta_{1} & 0 \\
+	S\theta_{1} & 0 & C\theta_{1} & 0  \\
+	0 & -1 & 0 & -d_{1} \\
+	0 & 0 & 0 & 1 \\ 
+\end{bmatrix}
+\]
+
+
+\section{References}
+
+%\cite{*}
+\bibliography{references}
+\bibliographystyle{ieeetr}
+
+\pagebreak
+\section{Appendices}
+
+\begin{dmath}
+	\hat{z_{6}} \times \vec{r_{6}} = \left[\begin{matrix}0\\0\\0\end{matrix}\right]
+\end{dmath}
+
+
+\end{document}
