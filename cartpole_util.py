@@ -88,13 +88,13 @@ class CartPoleEnv(gym.Env):
 
     def reset(self):
         # self.state = self.np_random.uniform(low=-0.05, high=0.05, size=(4,))
-        self.state = np.array([0,0,-math.pi/4,0])
+        self.state = np.array([0,0,-math.pi/20,0])
         self.steps_beyond_done = None
         return np.array(self.state)
 
     def render(self, mode='human'):
-        screen_width = 2200
-        screen_height = 1000
+        screen_width = 1200
+        screen_height = 800
 
         world_width = self.x_threshold*2
         scale = screen_width/world_width
@@ -140,3 +140,19 @@ class CartPoleEnv(gym.Env):
 
     def close(self):
         if self.viewer: self.viewer.close()
+
+    # execute force in simulated environment
+    def execute(self, ut):
+        self.force_mag = ut[0,0]
+        action = 1
+        x, reward, done, info = self.step(action)
+
+        return x
+
+    # get simulated sensor measurement
+    def sensor_measurement(self, x):
+        x_noise = np.copy(x)
+        x_noise += self.np_random.normal(0, 2e-4, size=(4,))
+        y = np.array([[x_noise[1], x_noise[3]]]).T
+
+        return y
