@@ -70,8 +70,8 @@ while 1:
     if frame is 0:
         ut = controller.input_design(x)
     else:
-        # ut = controller.input_design(estimate_x)
-        ut = controller.input_design(x)
+        ut = controller.input_design(estimate_x)
+        # ut = controller.input_design(x)
     # ut = controller.input_design(x)
     # execute the force in simulated environment
     x = env.execute(ut)
@@ -79,8 +79,8 @@ while 1:
     y = env.sensor_measurement(x)
 
     estimate_x = estimator.state_estimate(ut[0,0], y)
-    print("estimated x", estimate_x)
-    print("actual x", x)
+    # print("estimated x", estimate_x)
+    # print("actual x", x)
     
     # for plotting
     X.append(x[0])
@@ -98,7 +98,7 @@ while 1:
     time.append(frame*env.tau)
     env.render()
     # sleep(2)
-    if frame > 1000:
+    if frame > 100:
         break
 
 mat_data["time"] = time

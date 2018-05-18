@@ -14,6 +14,7 @@ class lqr(object):
     # input design method outputs optimal control signal
     # given best estimation of current state
     def input_design(self, x):
+        
         V = self.C[:4, :4]
         v = np.zeros((4))
         Ks = []
