@@ -24,6 +24,39 @@ class KF_estimate(object):
     def state_estimate(self, force, y):
         # update estimation from kalman filter
         # Kalman filter
+        self.KF.predict(u=force)
+        # Extended Kalman filter
+        # self.KF.x = non_linearized_model(self.env, self.KF.x, force)
+        # self.KF.P = self.KF._alpha_sq * np.dot(np.dot(self.KF.F, self.KF.P), self.KF.F.T) + self.KF.Q
+
+        # # save prior
+        # self.KF.x_prior = self.KF.x.copy()
+        # self.KF.P_prior = self.KF.P.copy()
+        
+        self.KF.update(y)
+
+        # return updated estimated state
+        return self.KF.x
+class EKF_estimate(object):
+    """ KF_estimate """
+    def __init__(self, env, A, B, H, x_0, R, P_0, Q):
+        self.A = A
+        self.B = B
+        self.H = H
+        self.KF = KalmanFilter(dim_x=4, dim_z=2, dim_u=1, compute_log_likelihood=True)
+        self.KF.x = x_0 # initial state
+        self.KF.F = np.copy(A) # transition matrix
+        self.KF.B = np.copy(B) # control matrix
+        self.KF.R = np.copy(R) # measurement noise
+        self.KF.H = np.copy(H)
+        self.KF.P = np.copy(P_0)
+        self.KF.Q = np.copy(Q)
+        self.env = env
+
+# estimate states from input of measurement
+    def state_estimate(self, force, y):
+        # update estimation from kalman filter
+        # Kalman filter
         # self.KF.predict(u=force)
         # Extended Kalman filter
         self.KF.x = non_linearized_model(self.env, self.KF.x, force)
