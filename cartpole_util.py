@@ -16,7 +16,7 @@ class CartPoleEnv(gym.Env):
         'video.frames_per_second' : 50
     }
 
-    def __init__(self):
+    def __init__(self, noise):
         self.gravity = 9.8
         self.masscart = 1.0
         self.masspole = 0.1
@@ -26,6 +26,7 @@ class CartPoleEnv(gym.Env):
         self.force_mag = 10.0
         self.tau = 0.02  # seconds between state updates
 
+        self.noise = noise
         # Angle at which to fail the episode
         self.theta_threshold_radians = 30 * 2 * math.pi / 360
         self.x_threshold = 2.4
@@ -66,7 +67,7 @@ class CartPoleEnv(gym.Env):
         theta = theta + self.tau * theta_dot
         theta_dot = theta_dot + self.tau * thetaacc
         self.state = (x,x_dot,theta,theta_dot)
-        self.state += self.np_random.normal(0, 1e-3, size=(4,))
+        self.state += self.np_random.normal(0, self.noise, size=(4,))
 
         done =  x < -self.x_threshold \
                 or x > self.x_threshold \
@@ -91,7 +92,7 @@ class CartPoleEnv(gym.Env):
     def reset(self):
         # self.state = self.np_random.uniform(low=-0.05, high=0.05, size=(4,))
         self.state = np.array([0,0,-math.pi/3,0])
-        self.state += self.np_random.normal(0, 1e-3, size=(4,))
+        self.state += self.np_random.normal(0, self.noise, size=(4,))
         self.steps_beyond_done = None
         return np.array(self.state)
 
