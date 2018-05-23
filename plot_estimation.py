@@ -14,8 +14,8 @@ def main():
 
     saved_data = sio.loadmat(logdir)
     time = saved_data["time"][0,:frames]
-    Est_X = saved_data["estimated_states"][:frames,0,0]
-    Est_TH = saved_data["estimated_states"][:frames,2,0]
+    Est_X = saved_data["states_est"][:frames,0,0]
+    Est_TH = saved_data["states_est"][:frames,2,0]
     TH = saved_data["states_act"][1:frames+1,2]
     X = saved_data["states_act"][1:frames+1,0]
 

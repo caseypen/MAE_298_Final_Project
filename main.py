@@ -9,11 +9,24 @@ from linear_quadratic_regulator import lqr
 import argparse
 import os
 import scipy.io as sio
+from math import pi
 
 def main():
-    # env = gym.make('CartPole-v0').env
+    # get parameters from command line
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--estimator', '-est', type=str, default='KF')
+    parser.add_argument('--store', action='store_true')
+    parser.add_argument('--v_x_est', '-xest',type=float, default=1e-1)
+    parser.add_argument('--v_xdot_est', '-vest',type=float, default=1e-1)
+    parser.add_argument('--v_theta_est', '-west',type=float, default=1e-1)
+    parser.add_argument('--v_thetadot_est','-aest', type=float, default=1e-1)
+    parser.add_argument('--system_noise','-noise', type=float, default=1e-2)
+    parser.add_argument('--starting_angle', '-angle', type=float, default=30)
+    parser.add_argument('--frames', '-n', type=int, default=500)
+    args = parser.parse_args()
+
     noise = 1e-2
-    env = CartPoleEnv(noise) 
+    env = CartPoleEnv(noise, pi*args.starting_angle/180) 
     # set random seed
     env.seed(1)
 
@@ -39,17 +52,6 @@ def main():
     # construct controller
     controller = lqr(T, F, C, c)
 
-    # get parameters from command line
-    
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--estimator', '-est', type=str, default='KF')
-    parser.add_argument('--store', action='store_true')
-    parser.add_argument('--v_x_est', '-xest',type=float, default=1e-1)
-    parser.add_argument('--v_xdot_est', '-vest',type=float, default=1e-1)
-    parser.add_argument('--v_theta_est', '-west',type=float, default=1e-1)
-    parser.add_argument('--v_thetadot_est','-aest', type=float, default=1e-1)
-    parser.add_argument('--frames', '-n', type=int, default=500)
-    args = parser.parse_args()
     # print(args.estimator == "EKF")
     """ State estimator """
     # contruct state estimator
@@ -129,9 +131,9 @@ def main():
         mat_data["time"] = time
         mat_data["states_act"] = states_actual
         mat_data["state_meas"] = measurements
-        mat_data["estimated_states"] = estimated_states
+        mat_data["states_est"] = estimated_states
         mat_data["inputs"] = U
-        logdir = './data/' + args.estimator + '_' + str(args.frames) + '.mat'
+        logdir = './data/' + args.estimator + '_' + str(args.frames) + '_' + str(args.starting_angle) + '.mat'
         sio.savemat(logdir, mat_data)
 
 
