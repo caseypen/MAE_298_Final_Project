@@ -8,10 +8,13 @@
 ### Install gym package for visualization
 - pip install gym
 ### Run real time control with lqr
-- python main.py -est EKF --store --frames 500  
-  * Running with extended kalman filter  
-  * Store data file in ./data folder  
-  * Running 500 frames  
+- python main.py -est EKF -n 500 -angle 35 -noise 1e-1 --store  
+  * "-est": Specify estimator
+  * "--store": Store data file in ./data folder, if added 
+  * "-n": specify running frames
+  * "-noise": specify system noise
+  * "-angle": specify starting angles of system  
+  
 ### Data is saved in ./data/somename.mat
 - Data check in "Data check.ipynb"
 - "time": time steps array
