@@ -10,8 +10,8 @@
 ### Run real time control with lqr
 - python main.py -est EKF --store --frames 500
   * Running with extended kalman filter
-  * Store data file in ./data folder
--- Running 500 frames
+  * Store data file in ./data folder
+  * Running 500 frames
 ### Data is saved in ./data/somename.mat
 - Data check in "Data check.ipynb"
 - "time": time steps array
