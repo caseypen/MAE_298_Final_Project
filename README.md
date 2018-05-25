@@ -7,6 +7,7 @@
 ## How to start:
 ### Install gym package for visualization
 - pip install gym
+- pip install filterpy
 ### Run real time control with lqr
 - python main.py -est EKF -n 500 -angle 35 -noise 1e-1 --store  
   * "-est": Specify estimator
