@@ -9,12 +9,13 @@
 - pip install gym
 - pip install filterpy
 ### Run real time control with lqr
-- python main.py -est EKF -n 500 -angle 35 -noise 1e-1 --store  
-  * "-est": Specify estimator
-  * "--store": Store data file in ./data folder, if added 
+- python main.py -est EKF -n 500 -angle 35 -noise 1e-1 -xest 1e-1 -vest 1e-1 -thest 1e-1 -west 1e-1 --store  
+  * "-est": Specify estimator, it could be EKF, UKF and KF
+  * "-xest, -vest, -thest, -west": estimated process noise
+  * "--store": Store data file in ./data folder, if added
   * "-n": specify running frames
-  * "-noise": specify system noise
-  * "-angle": specify starting angles of system  
+  * "-noise": specify system noise (assume noises in all states are the same and constant)
+  * "-angle": specify starting angles of system (other states are zeros)  
   
 ### Data is saved in ./data/somename.mat
 - Data check in "Data check.ipynb"
