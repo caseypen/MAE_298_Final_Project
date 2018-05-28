@@ -4,7 +4,7 @@ import numpy as np
 from time import sleep
 from cartpole_util import CartPoleEnv
 from system_dynamics import linearized_model_control, linearized_model_estimate
-from system_estimate import KF_estimate, EKF_estimate
+from system_estimate import KF_estimate, EKF_estimate, UKF_estimate
 from linear_quadratic_regulator import lqr
 import argparse
 import os
@@ -18,14 +18,14 @@ def main():
     parser.add_argument('--store', action='store_true')
     parser.add_argument('--v_x_est', '-xest',type=float, default=1e-1)
     parser.add_argument('--v_xdot_est', '-vest',type=float, default=1e-1)
-    parser.add_argument('--v_theta_est', '-west',type=float, default=1e-1)
-    parser.add_argument('--v_thetadot_est','-aest', type=float, default=1e-1)
+    parser.add_argument('--v_theta_est', '-thest',type=float, default=1e-1)
+    parser.add_argument('--v_thetadot_est','-west', type=float, default=1e-1)
     parser.add_argument('--system_noise','-noise', type=float, default=1e-2)
     parser.add_argument('--starting_angle', '-angle', type=float, default=30)
     parser.add_argument('--frames', '-n', type=int, default=500)
     args = parser.parse_args()
 
-    noise = 1e-2
+    noise = args.system_noise
     env = CartPoleEnv(noise, pi*args.starting_angle/180) 
     # set random seed
     env.seed(1)
@@ -71,6 +71,8 @@ def main():
         estimator = KF_estimate(env, A, B, H, x_0, R, P_0, Q)
     elif args.estimator == "EKF":
         estimator = EKF_estimate(env, A, B, H, x_0, R, P_0, Q)
+    elif args.estimator == "UKF":
+        estimator = UKF_estimate(env, 4, 2, x_0, P_0, Q, R)
 
     frame = 0
     done = False
@@ -105,7 +107,9 @@ def main():
         estimate_x = estimator.state_estimate(ut[0,0], y)
         print("estimated x", estimate_x)
         print("actual x", x)
-        
+        if args.estimator == "UKF":
+            estimate_x = np.atleast_2d(estimate_x).T
+
         # for plotting
         X.append(x[0])
         Est_X.append(estimate_x[0,0])

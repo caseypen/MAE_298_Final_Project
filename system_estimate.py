@@ -1,7 +1,7 @@
 import numpy as np
 from filterpy.kalman import KalmanFilter
-from system_dynamics import non_linearized_model, measurement
-from filterpy.kalman import UnscentedKalmanFilter, MerweScaledSigmaPoints
+from system_dynamics import non_linearized_model, measurement, UKF_model, UKF_measurement
+from filterpy.kalman import UnscentedKalmanFilter, JulierSigmaPoints
 from filterpy.common import Q_discrete_white_noise
 
 class KF_estimate(object):
@@ -24,15 +24,7 @@ class KF_estimate(object):
     def state_estimate(self, force, y):
         # update estimation from kalman filter
         # Kalman filter
-        self.KF.predict(u=force)
-        # Extended Kalman filter
-        # self.KF.x = non_linearized_model(self.env, self.KF.x, force)
-        # self.KF.P = self.KF._alpha_sq * np.dot(np.dot(self.KF.F, self.KF.P), self.KF.F.T) + self.KF.Q
-
-        # # save prior
-        # self.KF.x_prior = self.KF.x.copy()
-        # self.KF.P_prior = self.KF.P.copy()
-        
+        self.KF.predict(u=force)        
         self.KF.update(y)
 
         # return updated estimated state
@@ -73,10 +65,13 @@ class EKF_estimate(object):
 
 class UKF_estimate(object):
     """ UKF_estimate """
-    def __init__(self, env, dim_x, dim_y, P, Q, R):
-        self.sigmas = MerweScaledSigmaPoints(dim_x, alpha=.1, beta=2., kappa=1.)
-        self.ukf = UnscentedKalmanFilter( dim_x=dim_x, dim_z=dim_y, dt=env.tau, hx=measurement, 
-                                          fx=non_linearized_model, points=self.sigmas)
+    def __init__(self, env, dim_x, dim_y, X_0, P, Q, R):
+        # self.sigmas = JulierSigmaPoints(dim_x, alpha=.1, beta=2., kappa=1.)
+        self.sigmas = JulierSigmaPoints(dim_x)
+        self.env = env
+        self.ukf = UnscentedKalmanFilter( dim_x=dim_x, dim_z=dim_y, dt=env.tau, hx=UKF_measurement, 
+                                          fx=UKF_model, points=self.sigmas)
+        self.ukf.x = X_0[:,0]
         self.ukf.P = np.copy(P)
         self.ukf.R = np.copy(R)
         self.ukf.Q = np.copy(Q)
@@ -87,9 +82,9 @@ class UKF_estimate(object):
         # Kalman filter
         # self.KF.predict(u=force)
         # Extended Kalman filter
-        self.ukf.predict(u=force)
+        self.ukf.predict(env=self.env, u=force)
         self.ukf.update(y)
         
-        print(self.ukf.x)
+        # print(self.ukf.x)
         # return updated estimated state
         return self.ukf.x
