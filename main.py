@@ -3,7 +3,7 @@ import gym
 import numpy as np
 from time import sleep
 from cartpole_util import CartPoleEnv
-from system_dynamics import linearized_model_control, linearized_model_estimate
+from system_dynamics import linearized_model_control, linearized_model_estimate, discrete_model
 from system_estimate import KF_estimate, EKF_estimate, UKF_estimate
 from linear_quadratic_regulator import lqr
 import argparse
@@ -16,10 +16,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--estimator', '-est', type=str, default='KF')
     parser.add_argument('--store', action='store_true')
-    parser.add_argument('--v_x_est', '-xest',type=float, default=1e-1)
-    parser.add_argument('--v_xdot_est', '-vest',type=float, default=1e-1)
-    parser.add_argument('--v_theta_est', '-thest',type=float, default=1e-1)
-    parser.add_argument('--v_thetadot_est','-west', type=float, default=1e-1)
+    parser.add_argument('--v_x_est', '-xest',type=float, default=1e-2)
+    parser.add_argument('--v_xdot_est', '-vest',type=float, default=1e-2)
+    parser.add_argument('--v_theta_est', '-thest',type=float, default=1e-2)
+    parser.add_argument('--v_thetadot_est','-west', type=float, default=1e-2)
     parser.add_argument('--system_noise','-noise', type=float, default=1e-2)
     parser.add_argument('--starting_angle', '-angle', type=float, default=30)
     parser.add_argument('--frames', '-n', type=int, default=500)
@@ -37,7 +37,8 @@ def main():
     # linearized model for lqr controller
     F = linearized_model_control(env)
     A, B, H = linearized_model_estimate(env)
-
+    # A, B, H, _ = discrete_model(env)
+    
     """ lqr controller """
     # control design parameters
     C = np.array([
@@ -62,8 +63,8 @@ def main():
                   [0,            0,               0,                args.v_thetadot_est]])
 
     # assume that R is known from datasheet of sensors which are accurate
-    R = np.array([[2e-4, 0],
-                  [0,    2e-4]])
+    R = np.array([[2e-6, 0],
+                  [0,    2e-6]])
     
     # assume accurate initial variance of states
     P_0 = np.copy(Q) 

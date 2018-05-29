@@ -1,6 +1,45 @@
 import numpy as np
 import gym
 import math
+from scipy import signal
+
+
+def discrete_model(env):
+    # linearized continuous model
+    J = 1/12*(env.masspole*2)**2
+    beta = env.masspole*env.masscart*env.length**2 + J*(env.masspole+env.masscart)
+    ac = -(env.masspole**2*env.length**2*env.gravity)/beta
+    bc = (J+env.masspole*env.length**2)/beta
+    cc = env.masspole*env.length*env.gravity*(env.masscart+env.masspole)/beta
+    dc = -env.masspole*env.length/beta
+
+    A_c = np.array([[0,1,0,0],
+              [0,0,ac,0],
+              [0,0,0,1],
+              [0,0,cc,0]])
+    B_c = np.array([[0],
+                    [bc],
+                    [0],
+                    [dc]])
+    C_c = np.array([[0,1,0,0],
+                   [0,0,0,1]])
+    D_c = np.array([[0],
+                   [0]])
+    # discrete linearized model
+    sys = signal.StateSpace(A_c, B_c, C_c, D_c)
+    discrete_sys = sys.to_discrete(env.tau)
+    A = discrete_sys.A
+    B = discrete_sys.B
+    C = discrete_sys.C
+    D = discrete_sys.D
+    
+    # print(A)
+    # print(B)
+    # print(C)
+    # while True:
+    #     pass
+    return A, B, C, D
+
 # linearized function around equilibrum state
 # output is system dynamics
 def linearized_model_control(env):
