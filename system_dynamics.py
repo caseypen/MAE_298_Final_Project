@@ -21,9 +21,11 @@ def discrete_model(env):
                     [bc],
                     [0],
                     [dc]])
-    C_c = np.array([[1,1,0,0],
+    C_c = np.array([[1,env.tau,0,0],
+                    [0,1,0,0],
                    [0,0,0,1]])
     D_c = np.array([[0],
+                    [0],
                    [0]])
     # discrete linearized model
     sys = signal.StateSpace(A_c, B_c, C_c, D_c)
@@ -86,7 +88,8 @@ def linearized_model_estimate(env):
                     0,
                     tau * d
                     ]]).T
-    H = np.array([[1, 1, 0, 0],
+    H = np.array([[1, env.tau, 0, 0],
+                  [0, 1, 0, 0],
                   [0, 0, 0, 1]])
     # print(A)
     # print(B)
@@ -119,7 +122,7 @@ def UKF_model(state, dt, **kwargs):
 
 def UKF_measurement(x):
     x = np.array([x]).T
-    y = np.array([x[1,0], x[3,0]])
+    y = np.array([x[1,0]*0.02+x[0,0], x[1,0], x[3,0]])
     # print("measurement",y.shape)
     return y
 
@@ -145,6 +148,7 @@ def non_linearized_model(env, state, u):
 
 def measurement(x):
     
-    y = np.array([x[1,0], x[3,0]])
+    y = np.array([x[0,0]+x[1,0]*0.02, x[1,0], x[3,0]])
+
     return y
 

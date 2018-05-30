@@ -63,18 +63,21 @@ def main():
                   [0,            0,               0,                args.v_thetadot_est]])
 
     # assume that R is known from datasheet of sensors which are accurate
-    R = np.array([[2e-6, 0],
-                  [0,    2e-6]])
+    R = np.array([[2e-6, 0, 0],
+                  [0,  2e-6, 0],
+                  [0,    0, 2e-6]])
     
     # assume accurate initial variance of states
     P_0 = np.copy(Q) 
     # P_0 = np.zeros((4,4))
+    dim_x = len(x)
+    dim_y = R.shape[0]
     if args.estimator == "KF":
         estimator = KF_estimate(env, A, B, H, x_0, R, P_0, Q)
     elif args.estimator == "EKF":
         estimator = EKF_estimate(env, A, B, H, x_0, R, P_0, Q)
     elif args.estimator == "UKF":
-        estimator = UKF_estimate(env, 4, 2, x_0, P_0, Q, R)
+        estimator = UKF_estimate(env, dim_x, dim_y, x_0, P_0, Q, R)
 
     frame = 0
     done = False

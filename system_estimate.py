@@ -10,7 +10,7 @@ class KF_estimate(object):
         self.A = A
         self.B = B
         self.H = H
-        self.KF = KalmanFilter(dim_x=4, dim_z=2, dim_u=1, compute_log_likelihood=True)
+        self.KF = KalmanFilter(dim_x=4, dim_z=3, dim_u=1, compute_log_likelihood=True)
         self.KF.x = x_0 # initial state
         self.KF.F = np.copy(A) # transition matrix
         self.KF.B = np.copy(B) # control matrix
@@ -35,7 +35,7 @@ class EKF_estimate(object):
         self.A = A
         self.B = B
         self.H = H
-        self.KF = KalmanFilter(dim_x=4, dim_z=2, dim_u=1, compute_log_likelihood=True)
+        self.KF = KalmanFilter(dim_x=4, dim_z=3, dim_u=1, compute_log_likelihood=True)
         self.KF.x = x_0 # initial state
         self.KF.F = np.copy(A) # transition matrix
         self.KF.B = np.copy(B) # control matrix
