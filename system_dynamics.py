@@ -21,7 +21,7 @@ def discrete_model(env):
                     [bc],
                     [0],
                     [dc]])
-    C_c = np.array([[0,1,0,0],
+    C_c = np.array([[1,1,0,0],
                    [0,0,0,1]])
     D_c = np.array([[0],
                    [0]])
@@ -86,7 +86,7 @@ def linearized_model_estimate(env):
                     0,
                     tau * d
                     ]]).T
-    H = np.array([[0, 1, 0, 0],
+    H = np.array([[1, 1, 0, 0],
                   [0, 0, 0, 1]])
     # print(A)
     # print(B)

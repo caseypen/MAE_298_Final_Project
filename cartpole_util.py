@@ -157,6 +157,6 @@ class CartPoleEnv(gym.Env):
     def sensor_measurement(self, x):
         x_noise = np.copy(x)
         x_noise += self.np_random.normal(0, 2e-4, size=(4,))
-        y = np.array([[x_noise[1], x_noise[3]]]).T
+        y = np.array([[x[0]+x_noise[1], x_noise[3]]]).T
 
         return y

@@ -16,11 +16,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--estimator', '-est', type=str, default='KF')
     parser.add_argument('--store', action='store_true')
-    parser.add_argument('--v_x_est', '-xest',type=float, default=1e-2)
-    parser.add_argument('--v_xdot_est', '-vest',type=float, default=1e-2)
-    parser.add_argument('--v_theta_est', '-thest',type=float, default=1e-2)
-    parser.add_argument('--v_thetadot_est','-west', type=float, default=1e-2)
-    parser.add_argument('--system_noise','-noise', type=float, default=1e-2)
+    parser.add_argument('--v_x_est', '-xest',type=float, default=1e-3)
+    parser.add_argument('--v_xdot_est', '-vest',type=float, default=1e-3)
+    parser.add_argument('--v_theta_est', '-thest',type=float, default=1e-3)
+    parser.add_argument('--v_thetadot_est','-west', type=float, default=1e-3)
+    parser.add_argument('--system_noise','-noise', type=float, default=1e-3)
     parser.add_argument('--starting_angle', '-angle', type=float, default=30)
     parser.add_argument('--frames', '-n', type=int, default=500)
     args = parser.parse_args()
@@ -36,8 +36,8 @@ def main():
 
     # linearized model for lqr controller
     F = linearized_model_control(env)
-    A, B, H = linearized_model_estimate(env)
-    # A, B, H, _ = discrete_model(env)
+    # A, B, H = linearized_model_estimate(env)
+    A, B, H, _ = discrete_model(env)
     
     """ lqr controller """
     # control design parameters
@@ -68,6 +68,7 @@ def main():
     
     # assume accurate initial variance of states
     P_0 = np.copy(Q) 
+    # P_0 = np.zeros((4,4))
     if args.estimator == "KF":
         estimator = KF_estimate(env, A, B, H, x_0, R, P_0, Q)
     elif args.estimator == "EKF":
