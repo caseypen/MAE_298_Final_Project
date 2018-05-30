@@ -110,7 +110,7 @@ def main():
         y = env.sensor_measurement(x)
 
         estimate_x = estimator.state_estimate(ut[0,0], y)
-        print("estimated x", estimate_x)
+        print("estimated x", estimate_x.T)
         print("actual x", x)
         if args.estimator == "UKF":
             estimate_x = np.atleast_2d(estimate_x).T
@@ -142,7 +142,7 @@ def main():
         mat_data["state_meas"] = measurements
         mat_data["states_est"] = estimated_states
         mat_data["inputs"] = U
-        logdir = './data/' + args.estimator + '_' + str(args.frames) + '_' + str(args.starting_angle) + '.mat'
+        logdir = './data/' + args.estimator + '_' + str(args.frames) + '_' + str(args.starting_angle) + str(args.system_noise)+ '.mat'
         sio.savemat(logdir, mat_data)
 
 
