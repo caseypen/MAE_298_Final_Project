@@ -36,8 +36,8 @@ def main():
 
     # linearized model for lqr controller
     F = linearized_model_control(env)
-    # A, B, H = linearized_model_estimate(env)
-    A, B, H, _ = discrete_model(env)
+    A, B, H = linearized_model_estimate(env)
+    # A, B, H, _ = discrete_model(env)
     
     """ lqr controller """
     # control design parameters
@@ -63,9 +63,10 @@ def main():
                   [0,            0,               0,                args.v_thetadot_est]])
 
     # assume that R is known from datasheet of sensors which are accurate
-    R = np.array([[2e-6, 0, 0],
-                  [0,  2e-6, 0],
-                  [0,    0, 2e-6]])
+    # R = np.array([[2e-6, 0, 0],
+    #               [0,  2e-6, 0],
+    #               [0,    0, 2e-6]])
+    R = np.atleast_2d(2e-6)
     
     # assume accurate initial variance of states
     P_0 = np.copy(Q) 
@@ -95,41 +96,60 @@ def main():
     inputs = []
     measurements = []
     states_actual.append(x)
+    ut_prev = 0
+    delta_f_max = 4
+    epsilon = 0.1
 
     while 1:
+
         # calculate input value
         if frame is 0:
-            ut = controller.input_design(x)
+            ut_desired = controller.input_design(x)
         else:
-            ut = controller.input_design(estimate_x)
+            ut_desired = controller.input_design(estimate_x)
             # ut = controller.input_design(x)
-        # ut = controller.input_design(x)
-        # execute the force in simulated environment
-        x = env.execute(ut)
-        # get measurement of states
-        y = env.sensor_measurement(x)
+        ut_desired = ut_desired[0,0]
+        # print (ut_desired)
+        while True:
+            # ut = controller.input_design(x)
+            # execute the force in simulated environment
+            delta_f = abs(ut_desired - ut_prev)
+            if delta_f > delta_f_max:
+                ut = ut_prev + delta_f_max*np.sign(ut_desired - ut_prev)
+                ut_prev = ut
+            else:
+                ut = ut_desired            
+            # print (ut)
+            ut += env.np_random.normal(0, (delta_f*0.12)**2)
+            ut = np.atleast_2d(ut)
+            x = env.execute(ut)
+            # get measurement of states
+            y = env.sensor_measurement(x)
 
-        estimate_x = estimator.state_estimate(ut[0,0], y)
-        print("estimated x", estimate_x.T)
-        print("actual x", x)
-        if args.estimator == "UKF":
-            estimate_x = np.atleast_2d(estimate_x).T
+            estimate_x = estimator.state_estimate(ut[0,0], y)
+            print("estimated x", estimate_x.T)
+            print("actual x", x)
+            if args.estimator == "UKF":
+                estimate_x = np.atleast_2d(estimate_x).T
 
-        # for plotting
-        X.append(x[0])
-        Est_X.append(estimate_x[0,0])
-        TH.append(x[2])
-        Est_TH.append(estimate_x[2,0])
-        U.append(ut)
+            # for plotting
+            X.append(x[0])
+            Est_X.append(estimate_x[0,0])
+            TH.append(x[2])
+            Est_TH.append(estimate_x[2,0])
+            U.append(ut)
 
-        # saving for mat file
-        states_actual.append(x) 
-        estimated_states.append(estimate_x)
-        measurements.append(y)
+            # saving for mat file
+            states_actual.append(x) 
+            estimated_states.append(estimate_x)
+            measurements.append(y)
 
-        frame += 1
-        time.append(frame*env.tau)
-        env.render()
+            frame += 1
+            time.append(frame*env.tau)
+            env.render()
+
+            if abs(ut_desired - ut[0,0]) < epsilon:
+                break
         # sleep(2)
         if frame > args.frames:
             break

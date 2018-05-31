@@ -10,7 +10,9 @@ class KF_estimate(object):
         self.A = A
         self.B = B
         self.H = H
-        self.KF = KalmanFilter(dim_x=4, dim_z=3, dim_u=1, compute_log_likelihood=True)
+        self.dim_x = len(x_0)
+        self.dim_y = R.shape[0]
+        self.KF = KalmanFilter(dim_x=self.dim_x, dim_z=self.dim_y, dim_u=1, compute_log_likelihood=True)
         self.KF.x = x_0 # initial state
         self.KF.F = np.copy(A) # transition matrix
         self.KF.B = np.copy(B) # control matrix
@@ -29,13 +31,16 @@ class KF_estimate(object):
 
         # return updated estimated state
         return self.KF.x
+
 class EKF_estimate(object):
     """ KF_estimate """
     def __init__(self, env, A, B, H, x_0, R, P_0, Q):
         self.A = A
         self.B = B
         self.H = H
-        self.KF = KalmanFilter(dim_x=4, dim_z=3, dim_u=1, compute_log_likelihood=True)
+        self.dim_x = len(x_0)
+        self.dim_y = R.shape[0]
+        self.KF = KalmanFilter(dim_x=self.dim_x, dim_z=self.dim_y, dim_u=1, compute_log_likelihood=True)
         self.KF.x = x_0 # initial state
         self.KF.F = np.copy(A) # transition matrix
         self.KF.B = np.copy(B) # control matrix
@@ -79,9 +84,6 @@ class UKF_estimate(object):
 # estimate states from input of measurement
     def state_estimate(self, force, y):
         # update estimation from kalman filter
-        # Kalman filter
-        # self.KF.predict(u=force)
-        # Extended Kalman filter
         self.ukf.predict(env=self.env, u=force)
         self.ukf.update(y)
         
