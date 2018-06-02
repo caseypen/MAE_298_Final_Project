@@ -16,10 +16,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--estimator', '-est', type=str, default='KF')
     parser.add_argument('--store', action='store_true')
-    parser.add_argument('--v_x_est', '-xest',type=float, default=2e-2)
+    parser.add_argument('--v_x_est', '-xest',type=float, default=2e-4)
     parser.add_argument('--v_xdot_est', '-vest',type=float, default=2e-2)
-    parser.add_argument('--v_theta_est', '-thest',type=float, default=2e-2)
+    parser.add_argument('--v_theta_est', '-thest',type=float, default=2e-4)
     parser.add_argument('--v_thetadot_est','-west', type=float, default=2e-2)
+    parser.add_argument('--noise_scale','-Q', type=float, default = 1 )
     parser.add_argument('--system_noise','-noise', type=float, default=2e-2)
     parser.add_argument('--starting_angle', '-angle', type=float, default=30)
     parser.add_argument('--measurements', '-mn', type=int, default=2)
@@ -58,11 +59,16 @@ def main():
     # print(args.estimator == "EKF")
     """ State estimator """
     # contruct state estimator
-    # Q = np.zeros((4, 4)) # assume that there are no process error
-    Q = np.array([[args.v_x_est, 0,               0,                0],
-                  [0,            args.v_xdot_est, 0,                0],
-                  [0,            0,               args.v_theta_est, 0],
-                  [0,            0,               0,                args.v_thetadot_est]])
+    # Q = np.zeros((4, 4)) # assume that there arep no process error
+    sigma_x = args.v_x_est
+    sigma_xdot = args.v_xdot_est*args.noise_scale#*B[1,0]
+    sigma_theta = args.v_theta_est
+    sigma_thetadot = args.v_thetadot_est*args.noise_scale#*B[3,0]
+    Q = np.array([[sigma_x,  0,          0,           0],
+                  [0,        sigma_xdot, 0,           0],
+                  [0,        0,          sigma_theta, 0],
+                  [0,        0,          0,           sigma_thetadot]])
+    # Q = np.array()
 
     # assume that R is known from datasheet of sensors which are accurate
     # R = np.array([[2e-6, 0, 0],
@@ -175,8 +181,8 @@ def main():
         mat_data["inputs"] = U
         logdir = './data/' + args.estimator + '_' \
                  + str(args.frames) + '_' \
-                 + str(args.starting_angle) \
-                 + str(args.system_noise) + '_mn' \
+                 + str(args.starting_angle)+'_' \
+                 + "Q" + str(args.noise_scale) + '_mn' \
                  + str(args.measurements)+'.mat'
         sio.savemat(logdir, mat_data)
         print("file saved")
