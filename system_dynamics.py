@@ -4,7 +4,7 @@ import math
 from scipy import signal
 
 
-def discrete_model(env):
+def discrete_model(env, measurements):
     # linearized continuous model
     J = 1/12*(env.masspole*2)**2
     beta = env.masspole*env.masscart*env.length**2 + J*(env.masspole+env.masscart)
@@ -27,8 +27,16 @@ def discrete_model(env):
     # D_c = np.array([[0],
     #                 [0],
     #                [0]])
-    C_c = np.array([[1,0,0,0]])
-    D_c = np.array([[0]])
+    # C_c = np.array([[1,0,0,0]])
+    # D_c = np.array([[0]])
+    if measurements is 2:
+        C_c = np.array([[1,0,0,0],
+                        [0,0,0,1]])
+        D_c = np.array([[0],
+                        [0]])
+    elif measurements is 1:
+        C_c = np.array([[1,0,0,0]])
+        D_c = np.array([[0]])
     # discrete linearized model
     sys = signal.StateSpace(A_c, B_c, C_c, D_c)
     discrete_sys = sys.to_discrete(env.tau)
@@ -68,7 +76,7 @@ def linearized_model_control(env):
 
 # linearized function around equilibrum state
 # output is linearized state space model
-def linearized_model_estimate(env):
+def linearized_model_estimate(env, measurements):
 
     gamma = (4.0 / 3.0 - env.masspole / env.total_mass)
 
@@ -90,10 +98,15 @@ def linearized_model_estimate(env):
                     0,
                     tau * d
                     ]]).T
+    if measurements is 1:
+        H = np.array([[1, 0, 0, 0]])
     # H = np.array([[1, env.tau, 0, 0],
     #               [0, 1, 0, 0],
     #               [0, 0, 0, 1]])
-    H = np.array([[1, 0, 0, 0]])
+    elif measurements is 2:
+        H = np.array([[1, 0, 0, 0],
+                      [0, 0, 0, 1]])
+    
     # print(A)
     # print(B)
     # print(H)
@@ -126,7 +139,8 @@ def UKF_model(state, dt, **kwargs):
 def UKF_measurement(x):
     # x = np.array([x]).T
     # y = np.array([x[1,0]*0.02+x[0,0], x[1,0], x[3,0]])
-    y = np.array([x[0]])
+    y = np.array([x[0], x[3]])
+    # y = np.array([x[0]])
     # print("measurement",y.shape)
     return y
 
@@ -153,6 +167,7 @@ def non_linearized_model(env, state, u):
 def measurement(x):
     
     # y = np.array([x[0,0]+x[1,0]*0.02, x[1,0], x[3,0]])
-    y = np.array([x[0,0]])
+    # y = np.array([x[0,0]])
+    y = np.array([x[0,0], x[3,0]])
     return y
 

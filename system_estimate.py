@@ -64,19 +64,22 @@ class EKF_estimate(object):
         self.KF.P_prior = self.KF.P.copy()
         
         self.KF.update(y)
+        print(self.KF.P)
 
         # return updated estimated state
         return self.KF.x
 
 class UKF_estimate(object):
     """ UKF_estimate """
-    def __init__(self, env, dim_x, dim_y, X_0, P, Q, R):
+    def __init__(self, env, dim_x, dim_y, X_0, P, Q, R, mn):
         # self.sigmas = JulierSigmaPoints(dim_x, alpha=.1, beta=2., kappa=1.)
-        self.sigmas = JulierSigmaPoints(dim_x)
+        self.sigmas = JulierSigmaPoints(dim_x, kappa=0.1)
         self.env = env
-        self.ukf = UnscentedKalmanFilter( dim_x=dim_x, dim_z=dim_y, dt=env.tau, hx=UKF_measurement, 
+        self.measure_nums = mn
+        self.ukf = UnscentedKalmanFilter( dim_x=dim_x, dim_z=dim_y, dt=env.tau, hx=self.measurement, 
                                           fx=UKF_model, points=self.sigmas)
         self.ukf.x = X_0[:,0]
+        # print(self.ukf.x.shape)
         self.ukf.P = np.copy(P)
         self.ukf.R = np.copy(R)
         self.ukf.Q = np.copy(Q)
@@ -86,7 +89,14 @@ class UKF_estimate(object):
         # update estimation from kalman filter
         self.ukf.predict(env=self.env, u=force)
         self.ukf.update(y)
-        
         # print(self.ukf.x)
         # return updated estimated state
         return self.ukf.x
+    
+    def measurement(self, x):
+        if self.measure_nums is 2:
+            y = np.array([x[0], x[3]])
+        elif self.measure_nums is 1:
+            y = np.array([x[0]])
+
+        return y

@@ -16,17 +16,18 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--estimator', '-est', type=str, default='KF')
     parser.add_argument('--store', action='store_true')
-    parser.add_argument('--v_x_est', '-xest',type=float, default=1e-3)
-    parser.add_argument('--v_xdot_est', '-vest',type=float, default=1e-3)
-    parser.add_argument('--v_theta_est', '-thest',type=float, default=1e-3)
-    parser.add_argument('--v_thetadot_est','-west', type=float, default=1e-3)
-    parser.add_argument('--system_noise','-noise', type=float, default=1e-3)
+    parser.add_argument('--v_x_est', '-xest',type=float, default=2e-2)
+    parser.add_argument('--v_xdot_est', '-vest',type=float, default=2e-2)
+    parser.add_argument('--v_theta_est', '-thest',type=float, default=2e-2)
+    parser.add_argument('--v_thetadot_est','-west', type=float, default=2e-2)
+    parser.add_argument('--system_noise','-noise', type=float, default=2e-2)
     parser.add_argument('--starting_angle', '-angle', type=float, default=30)
+    parser.add_argument('--measurements', '-mn', type=int, default=2)
     parser.add_argument('--frames', '-n', type=int, default=500)
     args = parser.parse_args()
 
     noise = args.system_noise
-    env = CartPoleEnv(noise, pi*args.starting_angle/180) 
+    env = CartPoleEnv(noise, pi*args.starting_angle/180, args.measurements) 
     # set random seed
     env.seed(1)
 
@@ -36,8 +37,9 @@ def main():
 
     # linearized model for lqr controller
     F = linearized_model_control(env)
-    A, B, H = linearized_model_estimate(env)
-    # A, B, H, _ = discrete_model(env)
+    # linearized model for state estimation
+    A, B, H = linearized_model_estimate(env, args.measurements)
+    # A, B, H, _ = discrete_model(env, args.measurements)
     
     """ lqr controller """
     # control design parameters
@@ -66,8 +68,13 @@ def main():
     # R = np.array([[2e-6, 0, 0],
     #               [0,  2e-6, 0],
     #               [0,    0, 2e-6]])
-    R = np.atleast_2d(2e-6)
-    
+    if args.measurements is 1:
+        R = np.array([[4e-4]])
+    elif args.measurements is 2:
+        R = np.array([[4e-4, 0],
+                      [0,  4.4e-5]])
+    # R = np.array([[2e-6, 0],
+    #               [0,  2e-6]])
     # assume accurate initial variance of states
     P_0 = np.copy(Q) 
     # P_0 = np.zeros((4,4))
@@ -78,7 +85,7 @@ def main():
     elif args.estimator == "EKF":
         estimator = EKF_estimate(env, A, B, H, x_0, R, P_0, Q)
     elif args.estimator == "UKF":
-        estimator = UKF_estimate(env, dim_x, dim_y, x_0, P_0, Q, R)
+        estimator = UKF_estimate(env, dim_x, dim_y, x_0, P_0, Q, R, args.measurements)
 
     frame = 0
     done = False
@@ -97,7 +104,7 @@ def main():
     measurements = []
     states_actual.append(x)
     ut_prev = 0
-    delta_f_max = 4
+    delta_f_max = 10
     epsilon = 0.1
 
     while 1:
@@ -120,15 +127,19 @@ def main():
             else:
                 ut = ut_desired            
             # print (ut)
-            ut += env.np_random.normal(0, (delta_f*0.12)**2)
+            
             ut = np.atleast_2d(ut)
             x = env.execute(ut)
+            # introduce noise of input
+            ut += env.np_random.normal(0, args.system_noise)
+            # ut += env.np_random.normal(0, args.system_noise+(delta_f*0.12)**2)
             # get measurement of states
             y = env.sensor_measurement(x)
 
             estimate_x = estimator.state_estimate(ut[0,0], y)
             print("estimated x", estimate_x.T)
             print("actual x", x)
+            
             if args.estimator == "UKF":
                 estimate_x = np.atleast_2d(estimate_x).T
 
@@ -162,9 +173,13 @@ def main():
         mat_data["state_meas"] = measurements
         mat_data["states_est"] = estimated_states
         mat_data["inputs"] = U
-        logdir = './data/' + args.estimator + '_' + str(args.frames) + '_' + str(args.starting_angle) + str(args.system_noise)+ '.mat'
+        logdir = './data/' + args.estimator + '_' \
+                 + str(args.frames) + '_' \
+                 + str(args.starting_angle) \
+                 + str(args.system_noise) + '_mn' \
+                 + str(args.measurements)+'.mat'
         sio.savemat(logdir, mat_data)
-
+        print("file saved")
 
 if __name__ == "__main__":
     main()

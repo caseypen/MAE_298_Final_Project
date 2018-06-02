@@ -13,8 +13,9 @@ def main():
     parser.add_argument('--frames', type=int, default=500)
     args = parser.parse_args()
 
-    logdir = "./data/" + args.file
+    logdir = args.file
     frames = args.frames
+    print(logdir)
 
     saved_data = sio.loadmat(logdir)
     time = saved_data["time"][0,:frames]

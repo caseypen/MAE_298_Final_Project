@@ -16,12 +16,14 @@ class CartPoleEnv(gym.Env):
         'video.frames_per_second' : 50
     }
 
-    def __init__(self, noise, angle):
+    def __init__(self, noise, angle, measurement_number):
         self.gravity = 9.8
-        self.masscart = 1.0
-        self.masspole = 0.1
+        # self.masscart = 1.0
+        # self.masspole = 0.1
+        self.masscart = 0.94
+        self.masspole = 0.23
         self.total_mass = (self.masspole + self.masscart)
-        self.length = 0.5 # actually half the pole's length
+        self.length = 0.3302 # actually half the pole's length
         self.polemass_length = (self.masspole * self.length)
         self.force_mag = 10.0
         self.tau = 0.02  # seconds between state updates
@@ -30,7 +32,7 @@ class CartPoleEnv(gym.Env):
         # Angle at which to fail the episode
         self.theta_threshold_radians = 30 * 2 * math.pi / 360
         self.x_threshold = 2.4
-
+        self.measurement_number = measurement_number
         # Angle limit set to 2 * theta_threshold_radians so failing observation is still within bounds
         high = np.array([
             self.x_threshold * 2,
@@ -156,8 +158,13 @@ class CartPoleEnv(gym.Env):
     # get simulated sensor measurement
     def sensor_measurement(self, x):
         x_noise = np.copy(x)
+        if self.measurement_number is 1:
         # x_noise += self.np_random.normal(0, 2e-6, size=(4,))
         # y = np.array([[x[0] + x_noise[1]*self.tau, x_noise[1], x_noise[3]]]).T
-        x_noise += self.np_random.normal(0, 2e-6)
-        y = np.array([[x_noise[0]]])
+            pos_noise = self.np_random.normal(0, 4e-4)
+            y = np.array([x_noise[0] + pos_noise])
+        elif self.measurement_number is 2:
+            pos_noise = self.np_random.normal(0, 4e-4)
+            w_noise = self.np_random.normal(0, 4.3987e-5)
+            y = np.array([x_noise[0]+pos_noise, x_noise[3]+w_noise])
         return y
