@@ -7,7 +7,7 @@ for i in "${angles[@]}"; do
 	for j in "${estim[@]}"; do
 		for k in "${Q[@]}"; do
 			for l in "${mn[@]}"; do
-				echo "python main.py -est $j -angle $i -Q $k -mn $l --store"
+				python main.py -est $j -angle $i -Q $k -mn $l --store
 			done
 		done
 	done
