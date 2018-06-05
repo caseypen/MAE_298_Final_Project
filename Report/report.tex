@@ -100,8 +100,7 @@
 \listoftables
 \newpage
 
-
-\section{Introduction}
+\section{Examples}
 
 Example superscript JACO\textsuperscript{2} Example citation \cite{weisz2017assistive}
 
@@ -113,7 +112,6 @@ Example superscript JACO\textsuperscript{2} Example citation \cite{weisz2017assi
 \end{figure}
 
 Example Figure \ref{fig:diagram1} Example symbols $\epsilon$. Example table
-
 
 \begin{table}[h!]
 \centering
@@ -129,20 +127,7 @@ Example Figure \ref{fig:diagram1} Example symbols $\epsilon$. Example table
 \label{table:1}
 \end{table}
 
-Example equation
-
-\begin{equation}
-A\textsubscript{i} = 
-\begin{bmatrix}
-	C\theta_{i} & -S\theta_{i}C\alpha_{i} & S\theta_{i}S\alpha_{i} & a_{i}C\theta{i} \\
-	S\theta_{i} & C\theta_{i}C\alpha_{i} & -C\theta_{i}S\alpha_{i} & a_{i}S\theta{i}  \\
-	0 & S\alpha_{i} & C\alpha_{i} & s_{i} \\
-	0 & 0 & 0 & 1 \\
-\end{bmatrix}
-\label{aMatrix}
-\end{equation}
-
-Example matrix
+Example matrix with no equation number
 
 \[
 A_{1} = 
@@ -154,6 +139,44 @@ A_{1} =
 \end{bmatrix}
 \]
 
+\section{Introduction}
+
+\begin{equation}
+\textbf{x} = 
+\begin{bmatrix}
+	x \\
+	\dot{x} \\
+	\theta \\
+	\dot{\theta} \\
+\end{bmatrix}
+\label{xMatrix}
+\end{equation}
+
+\begin{equation}
+\beta = \dfrac{4}{3} - \dfrac{m}{M+m}
+\end{equation}
+
+\begin{equation}
+\textbf{A} = 
+\begin{bmatrix}
+	1 & \tau & 0 & 0 \\
+	0 & 1 & \dfrac{-gm\tau}{(M+m)\beta} & 0 \\
+	0 & 0 & 1 & \tau \\
+	0 & 0 & \dfrac{g\tau}{l\beta} & 1 \\
+\end{bmatrix}
+\label{aMatrix}
+\end{equation}
+
+\begin{equation}
+\textbf{A} = 
+\begin{bmatrix}
+	1 & \tau & 0 & 0 \\
+	0 & 1 & \dfrac{-gm\tau}{(M+m)\beta} & 0 \\
+	0 & 0 & 1 & \tau \\
+	0 & 0 & \dfrac{g\tau}{l\beta} & 1 \\
+\end{bmatrix}
+\label{aMatrix}
+\end{equation}
 
 \section{References}
 
