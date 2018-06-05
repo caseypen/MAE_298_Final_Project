@@ -4,6 +4,9 @@ clc;clear;close all;format compact
 set(0,'defaultAxesFontSize', 16);% Set axis font size to 16
 set(0,'defaulttextInterpreter','latex') %latex axis labels
 %###############################################################
+
+% Run this file in MATLAB to generate date for the configurations listed
+
 angles = [5 15 25 30 40];
 estim = {'KF','EKF','UKF'};
 Q = [0.1 1.0 10.0];

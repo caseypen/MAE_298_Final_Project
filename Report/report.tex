@@ -33,6 +33,8 @@
 \usepackage{arydshln}
 \usepackage{mathtools}
 \usepackage{breqn}
+\usepackage{fixltx2e}
+\graphicspath{ {images/} }
 
 % Margins
 \topmargin=-0.45in
@@ -60,8 +62,8 @@
 %	NAME AND CLASS SECTION
 %----------------------------------------------------------------------------------------
 
-\newcommand{\hmwkTitle}{Kalman Filtering for an Inverted Pendulum Proposal} % Assignment title
-\newcommand{\hmwkDueDate}{Wednesday,\ May\ 9,\ 2018} % Due date
+\newcommand{\hmwkTitle}{Kalman Filtering for an Inverted Pendulum Final Report} % Assignment title
+\newcommand{\hmwkDueDate}{Wednesday,\ June\ 6,\ 2018} % Due date
 \newcommand{\hmwkClass}{MAE\ 298} % Course/class
 \newcommand{\hmwkClassTime}{} % Class/lecture time
 \newcommand{\hmwkClassInstructor}{Professor Lin} % Teacher/lecturer
@@ -100,8 +102,8 @@
 \listoftables
 \newpage
 
-
-\section{Introduction}
+\section{Examples}
+Test as seen in \cite{kane}
 
 Example superscript JACO\textsuperscript{2} Example citation \cite{weisz2017assistive}
 
@@ -113,7 +115,6 @@ Example superscript JACO\textsuperscript{2} Example citation \cite{weisz2017assi
 \end{figure}
 
 Example Figure \ref{fig:diagram1} Example symbols $\epsilon$. Example table
-
 
 \begin{table}[h!]
 \centering
@@ -129,21 +130,7 @@ Example Figure \ref{fig:diagram1} Example symbols $\epsilon$. Example table
 \label{table:1}
 \end{table}
 
-Example equation
-
-\begin{equation}
-A\textsubscript{i} = 
-\begin{bmatrix}
-	C\theta_{i} & -S\theta_{i}C\alpha_{i} & S\theta_{i}S\alpha_{i} & a_{i}C\theta{i} \\
-	S\theta_{i} & C\theta_{i}C\alpha_{i} & -C\theta_{i}S\alpha_{i} & a_{i}S\theta{i}  \\
-	0 & S\alpha_{i} & C\alpha_{i} & s_{i} \\
-	0 & 0 & 0 & 1 \\
-\end{bmatrix}
-\label{aMatrix}
-\end{equation}
-
-Example matrix
-
+Example matrix with no equation number
 \[
 A_{1} = 
 \begin{bmatrix}
@@ -154,11 +141,65 @@ A_{1} =
 \end{bmatrix}
 \]
 
+\section{Introduction}
+\section{Derivation of Continuous State Space Model}
+\subsection{Description of System and Assumptions}
+\subsection{System Parameters}
+
+\begin{equation}
+\textbf{x} = 
+\begin{bmatrix}
+	x \\
+	\dot{x} \\
+	\theta \\
+	\dot{\theta} \\
+\end{bmatrix}
+\label{xMatrix}
+\end{equation}
+
+\begin{equation}
+\beta = \dfrac{4}{3} - \dfrac{m}{M+m}
+\end{equation}
+
+\begin{equation}
+\textbf{A} = 
+\begin{bmatrix}
+	1 & \tau & 0 & 0 \\
+	0 & 1 & \dfrac{-gm\tau}{(M+m)\beta} & 0 \\
+	0 & 0 & 1 & \tau \\
+	0 & 0 & \dfrac{g\tau}{l\beta} & 1 \\
+\end{bmatrix}
+\label{aMatrix}
+\end{equation}
+
+\begin{equation}
+\textbf{A} = 
+\begin{bmatrix}
+	1 & \tau & 0 & 0 \\
+	0 & 1 & \dfrac{-gm\tau}{(M+m)\beta} & 0 \\
+	0 & 0 & 1 & \tau \\
+	0 & 0 & \dfrac{g\tau}{l\beta} & 1 \\
+\end{bmatrix}
+\label{aMatrix}
+\end{equation}
+
+\section{Estimators and Resulting Discretized State Space Models}
+\subsection{Kalman Filter (KF)}
+\subsection{Extended Kalman Filter (EKF)}
+\subsection{Unscented Kalman Filter (UKF)}
+
+\section{Methodology}
+
+\section{Results}
+\subsection{Offline Results}
+\subsection{Online Results}
+
+\section{Conclusions}
 
 \section{References}
 
 %\cite{*}
-\bibliography{references}
+\bibliography{references}{}
 \bibliographystyle{ieeetr}
 
 \pagebreak
