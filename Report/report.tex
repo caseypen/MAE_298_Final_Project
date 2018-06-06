@@ -123,7 +123,7 @@
 
  This project used a pole on a cart model as an inverted pendulum system and investigated the use of different estimators: the Kalman Filter (KF), the Extended Kalman Filter, and the Unscented Kalman Filter.  Since the KF is used for linearized systems, it is hypothesized that its performance will degrade at larger angles as the small angle approximation will be used to linearize the equations of motion.  The project also tested the use of a single sensor and two sensors, and it is expected that two sensors will yield a more accurate estimation of the states.  Finally, this project evaluated the RMSE (root mean square error) and run time across estimators (KF, EKF, UKF) with different tuning.  The following sections discuss the system, state space models, test cases, results, and conclusions.
 
-\section{Derivation of Continuous State Space Model}
+\section{Cart-Pole Inverted Pendulum System}
 \subsection{Description of System and Assumptions}
 The model used for our analysis is a 2 degree-of-freedom system (see Figure \ref{fig:sys_diagram}). It includes a rigid pole that has a single axis of rotation, and is attached to the cart with a pin-joint. The cart has a single translational axis corresponding to the ground plane. The underlying assumptions of this model are:
 \begin{multicols}{2}
@@ -223,9 +223,9 @@ y = \begin{bmatrix}
 
 \subsection{System Parameters Values}
 
-A sensor was selected for each measured state, cart position and pole anglular velocity, while trying to balance accuracy and cost.
+A sensor was selected for each measured state, cart position and pole anglular velocity, while trying to balance accuracy and cost. For the cart position, the Garmin LIDAR-Lite v3 was selected for its accuracy of +/-2.5cm and retail cost of \$129.99\cite{lidarSensor}. The sensor noise was then approximated as Gaussian zero-mean with a standard deviation, $\sigma_{v_1}$, equal to the specificed accuracy. To measure the angular rate of the pole, an InvenSense ITG-3200 MEMS gyroscope was selected, and is available from SparkFun for \$24.99. The datasheet\cite{gyroSensor} specifies the RMS noise to be 0.38$\frac{\circ{}}{sec}$. Since RMS noise is equivalent to standard deviation (provided that the noise is zero-mean), the 
 
-Based on this information, we selected an initial process and model noise of
+Based on this information, we selected an initial process and model noise of 
 \begin{equation}
 \begin{aligned}
 w_k \sim N(0,\sigma_w^2) \\
