@@ -40,6 +40,7 @@
 \usepackage [english]{babel}
 \usepackage [autostyle, english = american]{csquotes}
 \MakeOuterQuote{"}
+\usepackage{multirow}
 
 % Margins
 \topmargin=-0.45in
@@ -148,6 +149,7 @@ Using the above assumptions, we derived the non-linear equations of motion using
 \end{equation}
 \begin{table}[h!]
  \centering
+  \renewcommand{\arraystretch}{1.5}
  \begin{tabular}{ |c |c  |l |}
  \hline
  	 \textbf{Parameter} & \textbf{Value} & \textbf{Description}  \\ \hline
@@ -392,16 +394,16 @@ The offline test cases were constructed to evaluate linear and nonlinear estimat
 
 \begin{table}[h!]
  \centering
- \begin{tabular}{ |c |c  |c |c |c  |c  |c |}
+ \renewcommand{\arraystretch}{1.5}
+ \begin{tabular}{ |l |c  |c |c |}
  \hline
- 	 i & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
- 	 a\textsubscript{i} & 0 & d\textsubscript{2} & 0 & 0 & 0 & 0 \\ \hline
- 	 $\alpha$\textsubscript{i}  & -90 & 0 & -90 & 90 & -90 & 0 \\ \hline
- 	 $\theta$\textsubscript{i} & $\theta$\textsubscript{1} & $\theta$\textsubscript{2} & $\theta$\textsubscript{3} & $\theta$\textsubscript{4} & $\theta$\textsubscript{5} & $\theta$\textsubscript{6} \\ \hline
- 	 s\textsubscript{i} & -d\textsubscript{1} & 0 & $\epsilon$\ &  d\textsubscript{3} + d\textsubscript{4} & 0 & d\textsubscript{5} + d\textsubscript{6} \\ \hline
+ 	 \textbf{Estimator} & \textbf{KF} & \textbf{EKF} & \textbf{UKF} \\ \hline
+ 	 \textbf{Pole Starting Angles}  & \multicolumn{3}{|c|}{5$^{\circ}$, 15$^{\circ}$, 60$^{\circ}$} \\ \hline
+ 	 \textbf{Sensors} & x; x and $\dot\theta$ & \multicolumn{2}{|c|}{x and $\dot\theta$} \\ \hline
+ 	 \textbf{Q Scaling}  & \multicolumn{3}{|c|}{Q, 0.001Q, 0.1Q, 10Q} \\ \hline
  \end{tabular}
- \caption{D-H Parameters}
- \label{table:1}
+ \caption{Offline Test Cases}
+ \label{table:offlinecases}
  \end{table}
 
 \subsection{Online Results}
