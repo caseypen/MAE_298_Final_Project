@@ -121,11 +121,11 @@
 
  The inverted pendulum is a common system that has been well-studied in dynamics and controls \cite{boubaker2012inverted}.  The identifying characteristic of these systems is that the center of mass is above the pivot point resulting in an inherently unstable system.  Examples of inverted pendulum systems range from humans \cite{winter1995human}, where the feet are considered the pivot point, to the self-balancing Segway \cite{pathak2005velocity}.  These systems are nonlinear and require a feedback control loop and state estimation in order to balance or stabilize the system, such that the center of mass remains directly above the pivot point.  Any displacement from this configuration will result in the center of mass moving to a new equilibrium at the lowest potential energy.  The center of mass can be repositioned above the pivot point by a control system that applies a restorative force.  It is critical to provide the controller with accurate state estimations in order to calculate the appropriate restorative force.  Inaccurate state estimation can destabilize the system leading to large oscillations or an undesirable state, such as the Segway falling onto the ground.
 
- This project used a pole on a cart model (a.k.a. Cart-Pole) as an inverted pendulum system and investigated the use of different estimators: the Kalman Filter (KF), the Extended Kalman Filter, and the Unscented Kalman Filter.  Since the KF is used for linear or linearized systems, it is hypothesized that its performance will degrade at larger angles since the small angle approximation will be used to linearize the equations of motion.  The project also tested the use of a single sensor and two sensors, and it is expected that two sensors will yield a more accurate estimation of the states.  Finally, this project evaluated the RMSE (root mean square error) and total run time across estimators (KF, EKF, UKF) with different tuning.  The following sections discuss the system, state space models, test cases, results, and conclusions.
+ This project used a pole on a cart model as an inverted pendulum system and investigated the use of different estimators: the Kalman Filter (KF), the Extended Kalman Filter, and the Unscented Kalman Filter.  Since the KF is used for linearized systems, it is hypothesized that its performance will degrade at larger angles as the small angle approximation will be used to linearize the equations of motion.  The project also tested the use of a single sensor and two sensors, and it is expected that two sensors will yield a more accurate estimation of the states.  Finally, this project evaluated the RMSE (root mean square error) and run time across estimators (KF, EKF, UKF) with different tuning.  The following sections discuss the system, state space models, test cases, results, and conclusions.
 
 \section{Cart-Pole Inverted Pendulum System}
-\subsection{System, Assumptions, and Nonlinear State Equations}
-The model used for the analysis is a 2 degree-of-freedom system (see Figure \ref{fig:sys_diagram}). It includes a rigid pole that has a single axis of rotation and is attached to the cart with a pin-joint. The cart has a single translational axis corresponding to the ground plane. The underlying assumptions of this model are:
+\subsection{Description of System and Assumptions}\label{section:systemDescription}
+The model used for our analysis is a 2 degree-of-freedom system (see Figure \ref{fig:sys_diagram}). It includes a rigid pole that has a single axis of rotation, and is attached to the cart with a pin-joint. The cart has a single translational axis corresponding to the ground plane. The underlying assumptions of this model are:
 \begin{multicols}{2}
 \begin{enumerate}
 \item No friction between the ground and the cart wheels
@@ -142,7 +142,7 @@ The model used for the analysis is a 2 degree-of-freedom system (see Figure \ref
  	\caption{System Diagram}
  	\label{fig:sys_diagram}
  \end{figure}
-Using the above assumptions, the non-linear equations of motion\footnote{The equations have no moment of inertia term because assumption (3) results in $J=\frac{1}{12}m(2l)^2$} are derived using Newton's second law.  The description of the parameters and their values are given in Table \ref{table:paramvalues}.
+Using the above assumptions, we derived the non-linear equations of motion\footnote{The equations have no moment of inertia term because assumption (3) results in $J=\frac{1}{12}m(2l)^2$} using Newton's second law.  The description of the parameters and their values are given in Table \ref{table:paramvalues}.
 \begin{equation}
 \begin{aligned}
 \frac{4}{3}l \ddot{\theta} &= g \sin \theta - \cos \theta \ddot{x} \\
@@ -170,7 +170,7 @@ Using the above assumptions, the non-linear equations of motion\footnote{The equ
  \label{table:paramvalues}
  \end{table}
  \FloatBarrier
-These can be rearranged into the nonlinear continuous-time first-order system of equations:
+These can be rearranged into the nonlinear continuous-time first-order system of equations
 \begin{equation}
 \begin{aligned}
 \matr{\dot{x}} &= \matr{f}(\matr{x},u),\quad  \matr{x} = \begin{bmatrix}
@@ -186,14 +186,14 @@ These can be rearranged into the nonlinear continuous-time first-order system of
 	\ddot{\theta} \\
 \end{bmatrix} = \begin{bmatrix}
 \dot{x} \\
-\frac{F+ml\dot{\theta}^2\sin\theta}{M+m} -\frac{ml\cos\theta}{M+m}\frac{mgl\sin\theta- \frac{ml}{M+m} F\cos\theta -\frac{m^2l^2}{M+m}\dot{\theta}^2\sin\theta\cos\theta}{\frac{4}{3}ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta} \\[6pt]
+\frac{F+ml\dot{\theta}^2\sin\theta}{M+m} -\frac{ml\cos\theta}{m+M}\frac{mgl\sin\theta- \frac{ml}{M+m} F\cos\theta -\frac{m^2l^2}{m+M}\dot{\theta}^2\sin\theta\cos\theta}{\frac{4}{3}ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta} \\[6pt]
 \dot{\theta} \\
-\frac{mgl\sin\theta - \frac{ml}{M+m} F\cos\theta -\frac{m^2l^2}{M+m}\dot{\theta}^2\sin\theta\cos\theta}{\frac{4}{3}ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta }
+\frac{mgl\sin\theta - \frac{ml}{M+m} F\cos\theta -\frac{m^2l^2}{m+M}\dot{\theta}^2\sin\theta\cos\theta}{\frac{4}{3}ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta }
 \end{bmatrix}
 \end{aligned}
 \label{eq:nonlinear_ss_continuous}
 \end{equation}
-After rearranging into this form, the states of the system (the variables in vector $\matr{x}$) become evident. A description of each of the elements of the state vector is included in Table \ref{table:paramvalues}. No manipulation to the state equations is necessary since $\theta$, the critical output to be estimated, is already one of the states.
+After rearranging into this form, the states of the system (the variables in vector $\matr{x}$) become evident. A description of each of the elements of the state vector is included in Table \ref{table:paramvalues}. No manipulation to the state equations is necessary since $\theta$, the critical output to be estimated, is already one of the states.\\
 
 The original intention was to compare the performance of the estimators when using a single sensor to measure cart position (see Equation \ref{eq:singleoutput}) and two sensors for cart position and pole angular rate (see Equation \ref{eq:1output}). 
  \begin{align}
@@ -221,7 +221,7 @@ y = \begin{bmatrix}
 \label{eq:1output}
 \end{align}
 
-\subsection{Sensor Noise Characteristics}\label{ssecsensornoise}
+\subsection{Noise Characteristics}\label{ssecsensornoise}
 
 A sensor was selected for each measured state, cart position and pole anglular velocity, while trying to balance accuracy and cost. For the cart position, the Garmin LIDAR-Lite v3 was selected for its accuracy of +/-2cm and retail cost of \$129.99\cite{lidarSensor}. The sensor noise was then approximated as Gaussian zero-mean with a standard deviation, $\sigma_{v_1}$, equal to the specificed accuracy. To measure the angular rate of the pole, an InvenSense ITG-3200 MEMS gyroscope was selected, and is available from SparkFun for \$24.99. The datasheet\cite{gyroSensor} specifies the RMS noise to be $0.38\frac{\circ{}}{sec}=0.0066\frac{rad}{sec}$, and RMS noise is equal to standard $\sigma_v$ deviation provided that the noise is zero-mean. These measurement noise parameters are summarized in Table \ref{table:sensorNoise}.
 
@@ -237,18 +237,35 @@ A sensor was selected for each measured state, cart position and pole anglular v
  \caption{System measurement noise characteristics.}
  \label{table:sensorNoise}
  \end{table}
-Based on this information, we assume the noise to be Gaussian zero mean
+If a real cart-pole system was built using the parameters in Table \ref{table:paramvalues}, one must simply look at the assumptions in Section \ref{section:systemDescription} to see that there are many potential sources of error. These sources of error could easily be justified as disturbances, otherwise known as process noise, which is a distribution of possible outcomes for the states of the system. Given that this project focuses entirely on simulation data, a method had to be developed for introducing process noise to the system. The method selected for this project was to inject process noise by assuming it came in through the system input. Therefore, an initial value of $\sigma_{w}^2=0.0004$ was selected (See Appendix \ref{appendix:processNoise} for details on how a value was quantified). \\
+The process and measurement noise assumptions listed above can be summarized as
 \begin{equation}
 \begin{aligned}
-w_k \sim N(0,\sigma_w^2) \\
-v_k \sim N(0,\sigma_v^2)
+\matr{w}_k &\sim \matr{N}\left(\begin{bmatrix}
+0 \\
+0 \\
+0 \\
+0
+\end{bmatrix},\begin{bmatrix}
+\sigma_w^2 & 0 & 0 & 0 \\
+0 & \sigma_w^2 & 0 & 0 \\
+0 & 0 & \sigma_w^2 & 0 \\
+0 & 0 & 0 & \sigma_w^2
+\end{bmatrix}\right) \\
+\matr{v}_k &\sim \matr{N}\left(\begin{bmatrix}
+0 \\
+0
+\end{bmatrix},\begin{bmatrix}
+\sigma_{v_1}^2 & 0 \\
+0 & \sigma_{v_2}^2 
+\end{bmatrix}\right)
 \end{aligned}
 \end{equation}
 
 \section{Estimators and Resulting Discretized State Space Models}
 \subsection{Kalman Filter (KF)}
-
-The Kalman Filter (KF) is the best linear estimator for nonlinear systems, and in order to implement it for a nonlinear system, the equations must be linearized. The control objective is to maintain the center of mass directly over the pivot point, which corresponds to a vertical position defined as $\theta$ = 0$^\circ$. Therefore, this is the angle about which to linearize; this is often called a "small angle approximation." This first-order truncation of the trigonometric Taylor series expansions results in the following substitutions to the nonlinear equations:
+*Note best linear estimator
+In order to implement a linear Kalman Filter, we will need to linearize these equations. Since the unstable portion of the system is directly related to the angle of the pole, it is our desire to keep the pole at the vertical position of 0$^\circ$. Therefore, this angle is the one about which we want to linearize; this is often called a "small angle approximation." This first-order truncation of the trigonometric Taylor series expansions results in the following substitutions to our nonlinear equations:
 \begin{align*}
 \sin \theta &\approx \theta \\
 \cos \theta &\approx 1 \\
@@ -284,14 +301,15 @@ where,
 \gamma &= J(M+m)+mMl^2 \\
 J &= \frac{1}{3}ml^2
 \end{align*}
-This equation, when placed alongside the output equation (Equation \ref{eq:1output}), is a representation of the familiar linear state-space form:
+This equation, when placed alongside the output equation (Equation \ref{eq:1output}), is a representation of the familiar linear state-space form
 \begin{equation*}
 \begin{aligned}
-\matr{\dot{x}} &= \matr{A}\matr{x} + \matr{B}\matr{u} \\
+\matr{\dot{x}} &= \matr{A}\matr{x} + \matr{B}u \\
 \matr{y} &= \matr{C}\matr{x}
 \end{aligned}
 \end{equation*}
-After substituting the parameter values and discretizing the model\footnote{The MATLAB function expm() was used to convert \textbf{A\textsubscript{c}} to \textbf{A} using the appropriate equation and \textbf{B\textsubscript{c}} to \textbf{B}. The MATLAB function c2d() was also used to confirm our results.}, 
+
+After substituting the parameter values and discretizing the model\footnote{The Matlab function expm() was used to convert \textbf{A\textsubscript{c}} to \textbf{A} using the appropriate equation and \textbf{B\textsubscript{c}} to \textbf{B}. The MATLAB function c2d() was also used to confirm our results.}, 
 the resulting Discretized Linear State Space Model is:
 
 \begin{equation}
@@ -324,8 +342,8 @@ x_{k} \\
 F
 \label{eq:linear_discrete}
 \end{equation}
-\subsubsection{Stability, Controllability, Observability, and Detectability Analysis}
-The intuition that the system is unstable can be verified by checking the stability criterion,
+\subsubsection{Stability Analysis}
+The intuition that the system is unstable can be verified by checking the stability criterion
 \begin{equation}
 |\vec{\lambda}(\matr{A})| < \vec{1}
 \end{equation}
@@ -555,7 +573,7 @@ Overall, the project results supported the initial hypotheses and the estimators
 \pagebreak
 \section{Appendices}
 \subsection{Controllability and Observability}\label{appendix:ctrb_obsv}
-
+\label%latex
 To check observability $\mathcal{O}$ and controllability $\mathcal{C}$, we constructed their respective matrices from the linear discrete time state space model using
 \begin{equation}
 \mathcal{C} = \begin{bmatrix}
