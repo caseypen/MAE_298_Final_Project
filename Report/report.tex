@@ -221,7 +221,7 @@ y = \begin{bmatrix}
 \label{eq:1output}
 \end{align}
 
-\subsection{Noise Characteristics}
+\subsection{Noise Characteristics}\label{ssecsensornoise}
 
 A sensor was selected for each measured state, cart position and pole anglular velocity, while trying to balance accuracy and cost. For the cart position, the Garmin LIDAR-Lite v3 was selected for its accuracy of +/-2cm and retail cost of \$129.99\cite{lidarSensor}. The sensor noise was then approximated as Gaussian zero-mean with a standard deviation, $\sigma_{v_1}$, equal to the specificed accuracy. To measure the angular rate of the pole, an InvenSense ITG-3200 MEMS gyroscope was selected, and is available from SparkFun for \$24.99. The datasheet\cite{gyroSensor} specifies the RMS noise to be $0.38\frac{\circ{}}{sec}=0.0066\frac{rad}{sec}$, and RMS noise is equal to standard $\sigma_v$ deviation provided that the noise is zero-mean. These measurement noise parameters are summarized in Table \ref{table:sensorNoise}.
 
@@ -437,8 +437,8 @@ Notice that the estimation of process noise is still added at each step of model
 	\matr{P}_{k|k}=	\matr{P}_{k|k-1} - \matr{P}_{xy}\matr{P}^{-1}_{y}\matr{P}_{xy}^T
 \label{eq:UKF6}
 \end{equation}
-\section{Methodology} 
-The system of inverted pendulum is constructed shown as a block diagram in Figure \ref{fig:block_diagram}. Given initial state $X_0$, LQR controller  calculates out optimal input force $F_1$ of current time step input to inverted pendulum system. The system responds to the input and output actual state $\matr{X}_1$ at next time step. The sensor measurement will output state measurement $\matr{y}_1$ give actual states. The input $F_1$ and measurements $\matr{y}_1$ are input to estimator and then output estimated states $\matr{\hat{X}}_2$ given to controller to calculate optimal input in time step $t_2$. The whole system will follows the loop of block diagram like this. The controller will calculate out optimal force only based on estimated states. The parameters are not tuned for different estimator to show the performance of different estimators in the real time system. In simulation, the benchmark of system performance is actual states input to the controller.
+\section{Methodology and Test Cases} 
+The general system architecture of an inverted pendulum is shown as a block diagram in Figure \ref{fig:block_diagram}. Given the initial state $X_0$, the LQR (Linear Quadratic Regulator) controller  calculates the optimal input force, $F_1$, to inverted pendulum system for the current time step. The system responds to the input and output actual state $\matr{X}_1$ at next time step. The sensor measurement will output state measurements, $\matr{y}_1$, that include noise. The input, $F_1$, and measurements, $\matr{y}_1$, are used as inputs to estimator and then the output estimated states, $\matr{\hat{X}}_2$, are given to controller to calculate optimal input, $F_2$, in time step $t_2$.  The controller will calculate the optimal force only based on estimated states. The controller parameters are not tuned for different estimators in order to show the performance of different estimators in the real time system. 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=10cm,keepaspectratio]{SystemArchitecture.png}
@@ -446,14 +446,12 @@ The system of inverted pendulum is constructed shown as a block diagram in Figur
 	\label{fig:block_diagram}
 \end{figure}
 
-Based on this, we build up a simulator to include all the components in our system. The estimator is going to be tested online coupled with all the other blocks. After each time of running, the simulation will record data of actual states, inputs and sensor measurements in all time steps. Then with those offline data, different estimators are running to compare their performances with the same inputs to estimators. 
-
 \subsection{Simulation description}
-Our simulation is constructed based upon a simulator in OpenAI Gym \cite{OpenAI}. We changed parameters of the system and input constraints referring an real inverted pendulum system \cite{lab6}. Process noise and measurement outputs are also added based on the system evaluation introduced in the previous chapters. The visualization of simulator is shown in Figure \ref{fig:simulator}.
+The purpose of the simulator is to generate ground truth (i.e. actual states), input, and measurement data for use in offline test cases, as well as for online comparison of estimators.  For the offline test cases, all the estimators recieve the same input and allows a more direct comparison. The simulator used in this project is based on the general system architecture (See Figure \ref{fig:block_diagram}) and contains modifications (See Appendix xx).  The simulation is modeled from a simulator in OpenAI Gym \cite{OpenAI}. The parameters of the system and input constraints were modified to reflect an actual inverted pendulum system \cite{lab6}. Process noise and measurement noise are also included based on the analysis discussed in Section \ref{ssecsensornoise}.  The animation produced by the simulator is shown in Figure \ref{fig:simulator}.
 \begin{figure}
 	\centering
 	\includegraphics[width=10cm,keepaspectratio]{Simulator.jpg}
-	\caption{Visualization of simulator}
+	\caption{Example of Animation Frame Produced by Simulator}
 	\label{fig:simulator}
 \end{figure}
 \subsection{Expected results}
