@@ -345,6 +345,7 @@ x_k + \dot{x}_k \Delta t \\
 \dot{\theta}_k + \biggr(\frac{mgl\sin\theta_k - \frac{ml}{M+m} F\cos\theta_k -\frac{m^2l^2}{m+M}\dot{\theta}_k^2\sin\theta_k\cos\theta_k}{J+ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta_k}\biggr) \Delta t
 \end{bmatrix}
 \end{aligned}
+\label{eq:nonlinear_discrete}
 \end{equation}
 Next, the Jacobian of the above equation will be evaluated at each time step
 \begin{align}
@@ -365,8 +366,28 @@ Using Equation \ref{eq:jacobian_EKF}, the \textit{a priori} covariance update, $
 \end{equation}
 The rest of the algorithm follows the same process as the linear Kalman Filter. 
 \subsection{Unscented Kalman Filter (UKF)}
-
-\section{Methodology}
+When the nonlinearity of dynamic model is serve, the state estimations propagate through linearized model will not be accurate. Though EKF includes nonlinear model in model prediction, it still use local linearized dynamic model ${\matr{A}'}$ to estimate variance matrix $\matr{P}_{k|k}$ at each time step. However, Unscented Kalman Filter (UKF) have been proved to have better accuracy of mean and variance of state estimation than EKF, especially in serve nonlinear dynamics model. In UKF, the mean and variance are estimated based on sample method. In this project we mainly used UKF from paper \cite{moireau2011reduced}. In model prediction, we select 2n sample points ($\sigma$ points) based on current knowledge of states estimation $\matr{\hat{X}_{k-1|k-1}}$ and $\matr{\hat{P}_{k-1|k-1}}$. The 2n sampling points are shown as below two equations.
+\begin{equation}
+	\hat{\matr{X}}^{(i)}_{k-1|k-1}+(\sqrt{n\matr{P}_{k-1|k-1}}),\  i=1,2,...n
+\end{equation}
+\begin{equation}
+ \hat{\matr{X}}^{(i)}_{k-1|k-1}-(\sqrt{n\matr{P}_{k-1|k-1}}),\  i=1,2,...n
+\end{equation}
+Then we use nonlinear discrete model from Equation \ref{eq:nonlinear_discrete} to propagate each $\sigma$ points to get state estimations $\hat{X}_{k|k-1}$. Then we calculate mean and variance of propagated sample points to get $\hat{\matr{X}}_{k|k-1}$ and $\hat{\matr{P}}_{k|k-1}$, with below equations.
+\begin{equation}
+ \hat{\matr{X}}_{k|k-1}=\frac{1}{2n}\sum_{i}^{2n}\hat{\matr{X}^{(i)}_{k|k-1}}
+\end{equation}
+\begin{equation}
+\hat{\matr{P}}_{k|k-1}=\frac{1}{2n}\sum_{i}^{2n}(\hat{\matr{X}^{(i)}_{k|k-1}}-\hat{\matr{X}_{k|k-1}})(\hat{\matr{X}^{(i)}_{k|k-1}}-\hat{\matr{X}_{k|k-1}})^T + \matr{Q}_{k-1}
+\end{equation}
+Notice that the estimation of process noise is still added at each step of model prediction. Therefore if we only use open loop estimation, the variance will not converge. In measurement update, we follow the similar steps of unscented transformation in model prediction, but using measurement function $h_k(x)$ to propagate 2n $\sigma$ points to obtain 2n estimated measurement points through output state space function. Then we need to calculate mean, variance $\matr{P}_y$ and covariance $\matr{P}_{xy}$ of transformed $\sigma$ points. With them, posterior state estimation can be obtained from equation below.
+\begin{equation}
+	\hat{\matr{X}}_{k|k} = 	\hat{\matr{X}}_{k|k-1} + \matr{P}_{xy} \matr{P}^{-1}_{y}(\matr{y_k}-\hat{\matr{y}}_{k|k-1})
+\end{equation}
+\begin{equation}
+	\matr{P}_{k|k}=	\matr{P}_{k|k-1} - \matr{P}_{xy}\matr{P}^{-1}_{y}\matr{P}_{xy}^T
+\end{equation}
+\section{Methodology} 
 
 \section{Results}
 \subsection{Offline Results}
