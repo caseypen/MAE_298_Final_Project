@@ -539,13 +539,13 @@ For our system, we inject the process noise from input of system. We assume the 
 	\caption{controlling circuit of motors}
 	\label{fig:circuit}
 \end{figure}
-The linear relationship between force and voltage is expressed as Equation \ref{FvsV}, $\alpha \approx 1.72$. We assume the H bridge with rated output, 12 Volts and 10 bit PWM accuracy. So the standard deviation of input noise can be approximated as 0.02.
+The linear relationship between force and voltage is expressed as Equation \ref{FvsV}, $\alpha \approx 1.72$ \cite{lab3}. We assume the H bridge with rated output, 12 Volts and 10 bit PWM accuracy. So the standard deviation of input noise can be approximated as 0.02.
 \begin{equation}
 F = \alpha V + B
 \label{FvsV}
 \end{equation}
 \subsection{Details of controller}
-In simulator, we use a discretized Linear Quadratic Regulator to output desired force at each time step. The idea is to use dynamic programming methodology to do backward recursion calculation starting from final position we want to get. At each step, with linear constraint and quadratic objective function, the desired force can be calculated by gradient method. Then the controller will choose first step of calculated force as input of system at current time step. The calculation for loop is shown in Figure \ref{fig:iLQR}.
+In simulator, we use a discretized Linear Quadratic Regulator to output desired force at each time step. The idea is to use dynamic programming methodology to do backward recursion calculation starting from final position we want to get. At each step, with linear constraint and quadratic objective function, the desired force can be calculated by gradient method. Then the controller will choose first step of calculated force as input of system at current time step. The calculation for loop is shown in Figure \ref{fig:iLQR} \cite{puterman2014markov}.
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=15cm,keepaspectratio]{LQR.png}
