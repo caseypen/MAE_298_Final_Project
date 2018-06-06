@@ -192,7 +192,7 @@ These can be rearranged into the nonlinear continuous-time first-order system of
 \label{eq:nonlinear_ss_continuous}
 \end{equation}
 
-The original intention was to compare the performance of the estimators when using a single sensor to measure cart position (see Equation \ref{eq:singleoutput}) and two sensors for cart position and pole angular rate (see Equation \ref{eq:1output}. 
+The original intention was to compare the performance of the estimators when using a single sensor to measure cart position (see Equation \ref{eq:singleoutput}) and two sensors for cart position and pole angular rate (see Equation \ref{eq:1output}). 
  \begin{align}
  y = \begin{bmatrix}
  1 & 0 & 0 & 0 \\
@@ -366,7 +366,7 @@ Using Equation \ref{eq:jacobian_EKF}, the \textit{a priori} covariance update, $
 \end{equation}
 The rest of the algorithm follows the same process as the linear Kalman Filter. 
 \subsection{Unscented Kalman Filter (UKF)}
-When the nonlinearity of dynamic model is serve, the state estimations propagate through linearized model will not be accurate. Though EKF includes nonlinear model in model prediction, it still use local linearized dynamic model ${\matr{A}'}$ to estimate variance matrix $\matr{P}_{k|k}$ at each time step. However, Unscented Kalman Filter (UKF) have been proved to have better accuracy of mean and variance of state estimation than EKF, especially in serve nonlinear dynamics model. In UKF, the mean and variance are estimated based on sample method. In this project we mainly used UKF from paper \cite{moireau2011reduced}. In model prediction, we select 2n sample points ($\sigma$ points) based on current knowledge of states estimation $\matr{\hat{X}_{k-1|k-1}}$ and $\matr{\hat{P}_{k-1|k-1}}$. The 2n sampling points are shown as below two equations.
+When the nonlinearity of dynamic model is serve, the state estimations propagate through linearized model will not be accurate. Though EKF includes nonlinear model in model prediction, it still uses local linearized dynamic model ${\matr{A}'}$ to estimate variance matrix $\matr{P}_{k|k}$ at each time step. However, Unscented Kalman Filter (UKF) has been proved to have better accuracy of mean and variance of state estimation than EKF, especially in serve nonlinear dynamics model. In UKF, the mean and variance are estimated based on sample method. In this project we mainly implemented UKF from paper \cite{moireau2011reduced}. In model prediction, we select 2n sample points ($\sigma$ points) based on current knowledge of states estimation $\matr{\hat{X}_{k-1|k-1}}$ and $\matr{\hat{P}_{k-1|k-1}}$. The 2n sampling points are shown as below two equations.
 \begin{equation}
 	\hat{\matr{X}}^{(i)}_{k-1|k-1}+(\sqrt{n\matr{P}_{k-1|k-1}}),\  i=1,2,...n
 \end{equation}
@@ -380,7 +380,7 @@ Then we use nonlinear discrete model from Equation \ref{eq:nonlinear_discrete} t
 \begin{equation}
 \hat{\matr{P}}_{k|k-1}=\frac{1}{2n}\sum_{i}^{2n}(\hat{\matr{X}^{(i)}_{k|k-1}}-\hat{\matr{X}_{k|k-1}})(\hat{\matr{X}^{(i)}_{k|k-1}}-\hat{\matr{X}_{k|k-1}})^T + \matr{Q}_{k-1}
 \end{equation}
-Notice that the estimation of process noise is still added at each step of model prediction. Therefore if we only use open loop estimation, the variance will not converge. In measurement update, we follow the similar steps of unscented transformation in model prediction, but using measurement function $h_k(x)$ to propagate 2n $\sigma$ points to obtain 2n estimated measurement points through output state space function. Then we need to calculate mean, variance $\matr{P}_y+R_k$ and covariance $\matr{P}_{xy}$ of transformed $\sigma$ points. With them, posterior state estimation can be obtained from equation below.
+Notice that the estimation of process noise is still added at each step of model prediction. Therefore if we only use open loop estimation, the variance will not converge. In measurement update, we follow the similar steps of unscented transformation in model prediction, but using measurement function $h_k(x)$ to propagate 2n $\sigma$ points to obtain 2n estimated measurement points through output state space function. Then we need to calculate mean, variance $\matr{P}_y+R_k$ and covariance $\matr{P}_{xy}$ of transformed $\sigma$ points. With them, posterior state estimation can be obtained from equations below.
 \begin{equation}
 	\hat{\matr{X}}_{k|k} = 	\hat{\matr{X}}_{k|k-1} + \matr{P}_{xy} \matr{P}^{-1}_{y}(\matr{y_k}-\hat{\matr{y}}_{k|k-1})
 \end{equation}
@@ -395,10 +395,11 @@ The system of inverted pendulum is constructed shown as a block diagram in Figur
 	\caption{Block diagram of our system}
 	\label{fig:block_diagram}
 \end{figure}
-We build up a simulator to include all the components in our system. The estimator is going to be tested online coupled with all the other blocks. After each time of running, the simulation will record data of actual states, inputs and sensor measurements in all time steps. Then with those offline data, different estimators are running to compare their performance with the same inputs. 
+
+Based on this, we build up a simulator to include all the components in our system. The estimator is going to be tested online coupled with all the other blocks. After each time of running, the simulation will record data of actual states, inputs and sensor measurements in all time steps. Then with those offline data, different estimators are running to compare their performances with the same inputs to estimators. 
 
 \subsection{Simulation description}
-Our simulation is constructed based upon a simulator in OpenAI Gym \cite{OpenAI}. We changed parameters of the system in original simulator and input constraints. Process noise and measurement outputs are also added based on the system evaluation introduced in the previous chapters. The visualization of simulator is shown in Figure \ref{fig:simulator}.
+Our simulation is constructed based upon a simulator in OpenAI Gym \cite{OpenAI}. We changed parameters of the system and input constraints referring an real inverted pendulum system \cite{lab6}. Process noise and measurement outputs are also added based on the system evaluation introduced in the previous chapters. The visualization of simulator is shown in Figure \ref{fig:simulator}.
 \begin{figure}
 	\centering
 	\includegraphics[width=10cm,keepaspectratio]{Simulator.jpg}
@@ -406,7 +407,7 @@ Our simulation is constructed based upon a simulator in OpenAI Gym \cite{OpenAI}
 	\label{fig:simulator}
 \end{figure}
 \subsection{Expected results}
-The whole simulation running based on discretized nonlinear system following Equations \ref{eq:nonlinear_discrete}. In small starting angles ($\theta<10^o$), the nonlinearity of system is not very severe, so the performance of KF should work fine. The estimated error of three estimators can be comparable. However, when the starting angle is increased, the linearity error of linearized system around equilibrium position will rise. As a result, KF will not perform well, while EKF and UKF will work much better in nonlinear case. For online testing, estimating states of KF in large starting angle condition will fail the controller, while EKF and UKF still get controller work fine. Likewise, in offline testing, the estimated error of KF will be larger than UKF and EKF in large starting angle of our system.
+The whole simulation running based on discretized nonlinear system following Equations \ref{eq:nonlinear_discrete}. In small starting angles ($\theta<10^o$), the nonlinearity of system is not very severe, so the performance of KF should work fine. The estimated error of three estimators can be comparable. However, when the starting angle is increased, the linearity error of linearized system around equilibrium position will rise. As a result, KF will not perform well, while EKF and UKF will work much better in nonlinear case. For online testing, estimating states of KF in large starting angle condition will fail the controller, while EKF and UKF still get controller to work fine. Likewise, in offline testing, the estimated error of KF will be larger than UKF and EKF in large starting angle of our system.
 \section{Results}
 \subsection{Offline Results}
 
@@ -476,7 +477,7 @@ With two sensor measurements, both KF and EKF work fine to stabilize the system 
 
 From figure, we can find that EKF still works pretty good when we set smaller Q, however, the KF works poorly and it proves that high linearity error for KF estimator.
 \subsubsection{Successful cases working online}
-In simulation, with different estimators, starting angles and sensors, multiple experiments are running to show the online performances of estimator. In the table, the largest starting angles are searched for online experiments. We can find that two measurements can greatly improve the estimation accuracy. However, when sensor measurements are not reliable, accurate model are needed to improve the estimation accuracy.
+In simulation, with different estimators, starting angles and sensors, multiple experiments are running to show the online performances of estimator. In the table \ref{table:offlinecases}, the largest starting angles are searched for online experiments. We can find that two measurements can greatly improve the estimation accuracy. However, when sensor measurements are not reliable, accurate model are needed to improve the estimation accuracy.
 \begin{table}[h!]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
