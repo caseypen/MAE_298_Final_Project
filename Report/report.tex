@@ -454,7 +454,7 @@ The comparison varying the number of sensors was restricted to the KF because th
  \label{table:rmse}
  \end{table}
  
- The final offline test case used a large pole starting angle ($\theta$ = 60$^{\circ}$), which was well beyond the expected limits of the KF.
+ The final offline test case used a large pole starting angle ($\theta$ = 60$^{\circ}$), which was well beyond the expected limits of the KF.  As shown in Figure \ref{fig:offline60deg} the nonlinear estimators track the ground truth well, whereas the KF has relatively large deviations, particularly as the pole changes direction.  The distribution of errors for the nonlinear estimators appear normally distributed.  The KF error distribution has a slight tail, but appeared relatively normally distributed.  The KF was able to bring the pole to an equilibrium above the pivot point during an offline case.  However, that was not the result during online testing and is discussed in Section \ref{ssec:LargeAngleOnline}.
   \begin{figure}[h!]
  	\centering
  	\includegraphics[width=15cm,keepaspectratio]{offline60deg.png}
@@ -462,9 +462,8 @@ The comparison varying the number of sensors was restricted to the KF because th
  	\label{fig:offline60deg}
  \end{figure}
 
-
 \subsection{Online Results}
-\subsubsection{KF, EKF for large angles}
+\subsubsection{KF, EKF for large angles} \label{ssec:LargeAngleOnline}
 With two sensor measurements, both KF and EKF work fine to stabilize the system around equilibrium position. However, if we decrease estimation of process noise estimation Q, which means to trust dynamic model more in estimation, we found that KF will not generate desired estimates to make the controller come to stable position. The online running result for KF and EKF is shown in Figure \ref{fig:onlineKFvsEKF}. 
 \begin{figure}[h!]
 	\centering
