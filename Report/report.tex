@@ -326,7 +326,7 @@ which says that all of the eigenvalues of the system must be less than 1 for the
 \end{equation}
 which does not meet the stibility criterion, confirming intuition.\\
 \\
-The Extended Kalman Filter differs from the regular Kalman Filter by utilizing the nonlinear discrete time state equations in place of the linear equations. This is accomplished by inserting the previous \textit{a posteriori} estimates of the states into the discrete nonlinear equations to get the \textit{a priori} estimate of the states at the current time step. This necessitates that the the nonlinear discrete time equations be computed. This is accomplished using a first-order Euler approximation of the continuous time versions (Equation \ref{eq:nonlinear_ss_continuous}):
+The Extended Kalman Filter differs from the regular Kalman Filter by utilizing the nonlinear discrete time state equations in place of the linear equations. This is accomplished by inserting the \textit{a posteriori} estimates of the states from the previous time step into the discrete nonlinear equations to get the \textit{a priori} estimate of the states at the current time step. This necessitates that the the nonlinear discrete time equations be computed. This is accomplished using first-order Euler approximations of the continuous time versions (Equation \ref{eq:nonlinear_ss_continuous}):
 \begin{equation}
 \begin{aligned}
 \matr{x}_{k+1} &= \matr{f}_k (\matr{x}_k,u_k) \\
@@ -343,7 +343,7 @@ x_k + \dot{x}_k \Delta t \\
 \end{bmatrix}
 \end{aligned}
 \end{equation}
-Next, the Jacobian of the above equation will be evaluated at each time step for the \textit{a priori} \textit{P} covariance matrix update:
+Next, the Jacobian of the above equation will be evaluated at each time step
 \begin{align}
 \begin{aligned}
 \matr{A'}_{k-1} &= \matr{J}\bigr|_{\hat{\matr{x}}_{k-1|k-1}} \\
@@ -354,11 +354,13 @@ Next, the Jacobian of the above equation will be evaluated at each time step for
 0 & 0 & \frac{\partial \dot{\theta}_{k+1}}{\partial \theta_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}}\Delta t & 1+\frac{\partial \dot{\theta}_{k+1}}{\partial \dot{\theta}_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}}\Delta t
 \end{bmatrix}
 \end{aligned}
+\label{eq:jacobian_EKF}
 \end{align}
-Then $\matr{P}_{k|k-1}$ is computed as
+Using Equation \ref{eq:jacobian_EKF}, the \textit{a priori} covariance update, $\matr{P}_{k|k-1}$, is computed as
 \begin{equation}
 \matr{P}_{k|k-1} = \matr{A}'_{k-1} \matr{P}_{k-1|k-1} {\matr{A}'}_{k-1}^T + \matr{Q}
 \end{equation}
+The rest of the algorithm follows the same process as the linear Kalman Filter. 
 \subsection{Unscented Kalman Filter (UKF)}
 
 \section{Methodology}
