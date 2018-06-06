@@ -454,12 +454,9 @@ The purpose of the simulator is to generate ground truth (i.e. actual states), i
 	\caption{Example of Animation Frame Produced by Simulator}
 	\label{fig:simulator}
 \end{figure}
-\subsection{Expected results}
-The whole simulation running based on discretized nonlinear system following Equations \ref{eq:nonlinear_discrete}. In small starting angles ($\theta<10^o$), the nonlinearity of system is not very severe, so the performance of KF should work fine. The estimated error of three estimators can be comparable. However, when the starting angle is increased, the linearity error of linearized system around equilibrium position will rise. As a result, KF will not perform well, while EKF and UKF will work much better in nonlinear case. For online testing, estimating states of KF in large starting angle condition will fail the controller, while EKF and UKF still get controller to work fine. Likewise, in offline testing, the estimated error of KF will be larger than UKF and EKF in large starting angle of our system.
-\section{Results}
-\subsection{Offline Results}
 
-The offline test cases were constructed to evaluate linear and nonlinear estimator performance for various conditions regarding the number of sensor measurements, starting pole angle and tuning.
+\subsection{Test Cases}
+The offline test cases were constructed to evaluate linear and nonlinear estimator performance for various conditions regarding the number of sensor measurements, starting pole angle and tuning.  The comparison varying the number of sensors was restricted to the KF because initial results made it clear that the performance of the selected single sensor was not adequate.  A summary of the offline test cases are shown in Table \ref{table:offlinecases}.
 \begin{table}[h!]
  \centering
  \renewcommand{\arraystretch}{1.5}
@@ -473,7 +470,16 @@ The offline test cases were constructed to evaluate linear and nonlinear estimat
  \caption{Offline Test Cases}
  \label{table:offlinecases}
  \end{table}
-The comparison varying the number of sensors was restricted to the KF because the results made it clear that a single sensor had poor performance, as seen in Figure \ref{fig:sensorsKF}.  The results did demonstrate that additional sensors will improve results, even if a sensor is noisy.  In this case, the addition of a second sensor improves the pole angle estimation and it follows the ground truth well.  All of the following test cases used two sensors.
+The online test cases sought to determine the maximum starting pole angle where the system could be stablized.  These test cases include a single sensor, but the measurement accuracy was adjusted to find a theoretical sensor that could work.  For the cases with two sensors, the two tuning conditions evaluated the estimators for when they had perfect knowledge of the process noise statistics and when there was high trust in the model.  This was done so that the estimator performance could be compared for one condition and to avoid confounding results.
+
+\subsection{Expected results}
+
+In terms of results, it is expected that two sensors will yield more accurate state estimation than a single sensor.  For small starting angles ($\theta<10^o$), the nonlinearity of system is not severe and the performance of KF should be similar to a nonlinear estimator.  However, as the starting pole angles increases, the linearity error of linearized system around equilibrium position will also increase. As a result, the KF will not perform well, while EKF and UKF will perform well. For online testing, the KF will not be able to provide the controller with sufficiently accurate state estimation as the angle increases.  In contrast, the EKF and the UKF should provide sufficiently accurate state estimation to the controller. In general, the KF will have large RMSE values than the nonlinear estimators and the test case run time will increase in order of KF, EKF, and UKF.
+
+\section{Results}
+\subsection{Offline Results}
+
+The offline test cases were constructed to evaluate linear and nonlinear estimator performance for various conditions regarding the number of sensor measurements, starting pole angle and tuning.  The comparison varying the number of sensors was restricted to the KF because the results made it clear that a single sensor had poor performance, as seen in Figure \ref{fig:sensorsKF}.  The results did demonstrate that additional sensors will improve results, even if a sensor is noisy.  In this case, the addition of a second sensor improves the pole angle estimation and it follows the ground truth well.  All of the following test cases used two sensors.
 \begin{figure}[h!]
  	\centering
  	\includegraphics[width=10cm,keepaspectratio]{SensorsKF.png}
@@ -514,18 +520,18 @@ The comparison varying the number of sensors was restricted to the KF because th
  \end{figure}
 
 \subsection{Online Results}
-\subsubsection{KF, EKF for large angles} \label{ssec:LargeAngleOnline}
-With two sensor measurements, both KF and EKF work fine to stabilize the system around equilibrium position. However, if we decrease estimation of process noise estimation Q, which means to trust dynamic model more in estimation, we found that KF will not generate desired estimates to make the controller come to stable position. The online running result for KF and EKF is shown in Figure \ref{fig:onlineKFvsEKF}. 
+\subsubsection{Large Starting Pole Angle} \label{ssec:LargeAngleOnline}
+With two sensor measurements, both the Kalman Filter (KF) and the Extended Kalman Filter (EKF) are able to stabilize the system around the desired equilibrium position during offline application (See Figure \ref{fig:offline60deg}). However, during an online application the KF will not provide sufficiently accurate estimates to the control and the system will not achieve a stable position. The online result for the KF and the EKF is shown in Figure \ref{fig:onlineKFvsEKF}. 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=15cm,keepaspectratio]{EKFvsKF_online.png}
 	\caption{Online result of EKF and KF}
 	\label{fig:onlineKFvsEKF}
 \end{figure}
+As seen in Figure \ref{fig:onlineKFvsEKF}, the EKF works well, but the KF performs poorly and demonstrates high linearity error.
 
-From figure, we can find that EKF still works pretty good when we set smaller Q, however, the KF works poorly and it proves that high linearity error for KF estimator.
-\subsubsection{Successful cases working online}
-In simulation, with different estimators, starting angles and sensors, multiple experiments are running to show the online performances of estimator. In the table \ref{table:offlinecases}, the largest starting angles are searched for online experiments. We can find that two measurements can greatly improve the estimation accuracy. However, when sensor measurements are not reliable, accurate model are needed to improve the estimation accuracy.
+\subsubsection{Summary of Starting Pole Angle Limits for Successful Online Application}
+Several online test cases were conducted to determine the largest starting pole angle across the estimators\footnote{The output is limited to represent force saturation, which restricts the ability of the controller to accomodate all possible starting pole angles.}. Table \ref{table:offlinecases} summarizes the results and shows that two sensors enable larger starting pole angles than a single sensor.  The nonlinear estimators can accomodate larger staring pole angles than the KF.  In the cases with a single sensor, none of the estimators coudl provide sufficiently accurate state estimation to the controller with the selected sensor.  It was possible to make a single sensor feasible by increasing the sensor accuracy.
 \begin{table}[h!]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
@@ -537,7 +543,7 @@ In simulation, with different estimators, starting angles and sensors, multiple 
 		\textbf{EKF} & None & $30^\circ{}$ & $63^\circ{}$ & $63^\circ{}$ \\ \hline
 		\textbf{UKF} & None & $30^\circ{}$ & $63^\circ{}$ & $63^\circ{}$ \\ \hline
 	\end{tabular}
-	\caption{Largest starting angle for various Online Test Cases and estimators}
+	\caption{Largest Starting Pole Angle for Various Online Test Cases and Estimators}
 	\label{table:offlinecases}
 \end{table}
 
