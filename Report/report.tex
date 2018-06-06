@@ -37,6 +37,9 @@
 \usepackage{indentfirst} 
 \graphicspath{ {images/} }
 \usepackage{bm}
+\usepackage [english]{babel}
+\usepackage [autostyle, english = american]{csquotes}
+\MakeOuterQuote{"}
 
 % Margins
 \topmargin=-0.45in
@@ -165,7 +168,7 @@ These can be rearranged into the nonlinear continuous-time first-order system of
 \end{aligned}
 \end{equation}
 
-The original intention was to compare the performance of the estimators when using a single sensor to measure cart position (see Equation \ref{eq:singleoutput}) and two sensors for cart position and pole angular rate (see Equation \ref{eq:1output}. 
+The original intention was to compare the performance of the estimators when using a single sensor to measure cart position (see Equation \ref{eq:singleoutput}) and two sensors for cart position and pole angular rate (see Equation \ref{eq:1output}). 
 \begin{align}
 y = \begin{bmatrix}
 1 & 0 & 0 & 0 \\
