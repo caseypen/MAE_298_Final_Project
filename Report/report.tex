@@ -165,7 +165,19 @@ These can be rearranged into the nonlinear continuous-time first-order system of
 \end{aligned}
 \end{equation}
 
-The original intention when applying a Kalman filter to this system was that we would measure just one of the states directly, and use these measurements to estimate the pole angle. We discovered that the only state output that measurement that resulted in a full-rank observability matrix $\mathcal{O}$ was the measurement of cart position. However, we ran into problems (See "Controllability and Observability", Appendix), and determined that a better estimator could be built if we measured two states, one of which was the cart position. Therefore, we also chose to measure pole angular rate, resulting in the output equation:
+The original intention was to compare the performance of the estimators when using a single sensor to measure cart position (see Equation \ref{eq:singleoutput}) and two sensors for cart position and pole angular rate (see Equation \ref{eq:1output}. 
+\begin{align}
+y = \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+\end{bmatrix} \begin{bmatrix}
+	x \\
+	\dot{x} \\
+	\theta \\
+	\dot{\theta} \\
+\end{bmatrix}
+\label{eq:singleoutput}
+\end{align}
+It was determined that cart position was the only state that could be measured by itself and result in a full-rank observability matrix $\mathcal{O}$. However, significantly poor performance led to further analysis (See Appendix \ref{observ}) and it was determined that all subsequent estimators should be built using measurements from two states, one of which was the cart position. Pole angular rate was selected as the second measurement, resulting in the output equation:
 \begin{align}
 y = \begin{bmatrix}
 1 & 0 & 0 & 0 \\
@@ -186,7 +198,7 @@ Equations \ref{eq:ss_continuous} and \ref{eq:1output} are representations of the
 \end{aligned}
 \end{equation}
 
-The state that is imperative for accurate measurement is the pole angle. In this pursuit, we want to select the highest accuracy sensors, within a reasonable range of cost. We looked at a few sensors, and \\
+A sensor was selected for each measured state, cart position and pole anglular velocity, while trying to balance accuracy and cost.
 
 Based on this information, we selected an initial process and model noise of
 \begin{equation}
@@ -309,7 +321,7 @@ J &= \frac{1}{3}ml^2
 
 \pagebreak
 \section{Appendices}
-\subsection{Controllability and Observability}
+\subsection{Controllability and Observability} \label{observ}
 \label%latex
 To check observability $\mathcal{O}$ and controllability $\mathcal{C}$, we constructed their respective matrices from the linear discrete time state space model using
 \begin{equation}
