@@ -235,7 +235,7 @@ v_k \sim N(0,\sigma_v^2)
 
 \section{Estimators and Resulting Discretized State Space Models}
 \subsection{Kalman Filter (KF)}
-
+*Note best linear estimator
 In order to implement a linear Kalman Filter, we will need to linearize these equations. Since the unstable portion of the system is directly related to the angle of the pole, it is our desire to keep the pole at the vertical position of 0$^\circ$. Therefore, this angle is the one about which we want to linearize; this is often called a "small angle approximation." This first-order truncation of the trigonometric Taylor series expansions results in the following substitutions to our nonlinear equations:
 \begin{align*}
 \sin \theta &\approx \theta \\
@@ -510,7 +510,26 @@ In simulation, with different estimators, starting angles and sensors, multiple 
 
 
 \section{Conclusions}
-This project focused on 
+
+This project sought to investigate the performance of three estimators--the linear Kalman Filter (KF), the nonlinear Extended Kalman Filter (EKF), and the nonlinear Unscented Kalman Filter (UKF)--under varying conditions for an unstable, nonlinear system.  The conditions included the number of sensors, the pole starting angle, and the tuning of estimated noise variance.  Measures used were RMSE, test case run time, and the ability of the estimator to stablize the system online.  The conclusions from this project are as follows:
+
+\textbf{Offline Results:}
+\begin{enumerate}
+\item The single sensor selected was not sufficient to accurately estimate the pole angle, but the results did illustrate the the addition of sensors improves state estimation.  All subsequent test cases used two sensors.
+\item The KF performed comparably to a nonlinear estimator, the EKF, for the small starting pole angle ($\theta$ = 5$^{\circ}$).
+\item The KF performance deviated from the nonlinear estimators, the EKF and the UKF, for a starting pole angle of 15$^{\circ}$, as measured as RMSE.  The KF could not be tuned to outperform the nonlinear estimators.  The results from tuning verified that a perfect estimate of the noise variance will yield the best estimation results, and over- or underestimation will result in larger errors.  The test case run time was the shortest for KF and longest for UKF.
+\item While the KF could track the ground truth and bring the system to an equilbruim for a large starting pole angle ($\theta$ = 60$^{\circ}$), the result was only applicable offline.  The nonlinear estimators need to be used for large starting pole angles.
+\end{enumerate}
+
+\textbf{Online Results:}
+\begin{enumerate}
+\item It was possible for a single sensor to work during online applications, if the sensor measurement accuracy was an order of magnitude better.  Using a more accurate sensor, the KF can perform online for starting pole angles up to 10$^{\circ}$ and 30$^{\circ}$ for the nonlinear estimators.
+\item When the model noise statistics are perfectly guessed, the KF can perform online for starting pole angles up to 60$^{\circ}$ and 63$^{\circ}$ for the nonlinear estimators.
+\item When the model is trusted more, the KF can perform online for starting pole angles up to 45$^{\circ}$ and 63$^{\circ}$ for the nonlinear estimators.
+\item In all cases, the nonlinear estimators can accomodate larger starting pole angles than the KF.
+\end{enumerate}
+
+Overall, the project results supported the initial hypotheses and the estimators generally behaved as expected.  One surprising result was the inability of the selected single sensor to work, but further investigation yielded a reasonable explanation.  It was also unexpected that the KF could run online with a starting pole angle of up to 45$^{\circ}$, which is beyond the small angle approximation limits, but demonstrates that the KF is the best linear estimator.  The implementation of process noise was a considerable challenge that resulted in a deeper understanding of the system.  It also highlighted the difficulties in estimating process noise a priori and the purpose of tuning.  This project demonstrated several concepts from the course and was a valuable learning experience.
 
 \section{References}
 
