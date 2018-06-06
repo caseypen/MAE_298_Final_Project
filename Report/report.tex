@@ -422,12 +422,20 @@ The offline test cases were constructed to evaluate linear and nonlinear estimat
  \caption{Offline Test Cases}
  \label{table:offlinecases}
  \end{table}
-The comparison varying the number of sensors was restricted to the KF because the results made it clear that a signle sensor had poor performance, as seen in Figure \ref{fig:sensorsKF}
+The comparison varying the number of sensors was restricted to the KF because the results made it clear that a single sensor had poor performance, as seen in Figure \ref{fig:sensorsKF}.  The results did demonstrate that additional sensors will improve results, even if a sensor is noisy.  In this case, the addition of a second sensor improves the pole angle estimation and it follows the ground truth well.  All of the following test cases used two sensors.
 \begin{figure}[h!]
  	\centering
  	\includegraphics[width=10cm,keepaspectratio]{SensorsKF.png}
  	\caption{Comparison of KF Results for a Single Sensor and Two Sensors (Pole starting angle = 5$^{\circ}$, Scaling = Q)}
  	\label{fig:sensorsKF}
+ \end{figure}
+ 
+ The next test case compared the use of linear (KF) and nonlinear estimators (EKF) for a small starting pole angle ($\theta$ = 5$^{\circ}$).  As seen in Figure \ref{fig:5degKFvEKF}
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width=15cm,keepaspectratio]{5degKFvEKF.png}
+ 	\caption{Comparison of KF and EKF (Pole starting angle = 5$^{\circ}$, Scaling = Q). \textbf{A} Estimation of pole angle \textbf{B} Error distribution \textbf{C} Estimated variance of the estimation}
+ 	\label{fig:5degKFvEKF}
  \end{figure}
 \subsection{Online Results}
 
