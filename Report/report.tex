@@ -334,10 +334,5 @@ CA^3
 \end{equation}
 This matrix was also full rank, which was perplexing. Professor Lin then suggested that we check the condition number of the observability matrix. Using the MATLAB command cond(), we evaluated cond($\mathcal{O}$) = $6.67e-5$, which suggests that the observability matrix is almost singular. This was the source of some of our problems in implementing our state estimators. Based on this information, we attempted to add another sensor at the pole angular rate. After doing this, the condition number of the observability matrix was $60.437$, a much more reasonable number.
 \ref{eq:EOM_nonlinear}
-\subsubsection{junk}
-\begin{dmath}
-	\hat{z_{6}} \times \vec{r_{6}} = \left[\begin{matrix}0\\0\\0\end{matrix}\right]
-\end{dmath}
-
 
 \end{document}
