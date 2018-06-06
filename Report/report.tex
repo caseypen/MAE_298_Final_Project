@@ -40,6 +40,7 @@
 \usepackage [english]{babel}
 \usepackage [autostyle, english = american]{csquotes}
 \MakeOuterQuote{"}
+\usepackage{multirow}
 
 % Margins
 \topmargin=-0.45in
@@ -148,6 +149,7 @@ Using the above assumptions, we derived the non-linear equations of motion using
 \end{equation}
 \begin{table}[h!]
  \centering
+  \renewcommand{\arraystretch}{1.5}
  \begin{tabular}{ |c |c  |l |}
  \hline
  	 \textbf{Parameter} & \textbf{Value} & \textbf{Description}  \\ \hline
@@ -407,21 +409,34 @@ The whole simulation running based on discretized nonlinear system following Equ
 \subsection{Offline Results}
 
 The offline test cases were constructed to evaluate linear and nonlinear estimator performance for various conditions regarding the number of sensor measurements, starting pole angle and tuning.
-
 \begin{table}[h!]
- \centering 
- \begin{tabular}{ |c |c  |c |c |c  |c  |c |}
+ \centering
+ \renewcommand{\arraystretch}{1.5}
+ \begin{tabular}{ |l |c  |c |c |}
  \hline
- 	 i & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
- 	 a\textsubscript{i} & 0 & d\textsubscript{2} & 0 & 0 & 0 & 0 \\ \hline
- 	 $\alpha$\textsubscript{i}  & -90 & 0 & -90 & 90 & -90 & 0 \\ \hline
- 	 $\theta$\textsubscript{i} & $\theta$\textsubscript{1} & $\theta$\textsubscript{2} & $\theta$\textsubscript{3} & $\theta$\textsubscript{4} & $\theta$\textsubscript{5} & $\theta$\textsubscript{6} \\ \hline
- 	 s\textsubscript{i} & -d\textsubscript{1} & 0 & $\epsilon$\ &  d\textsubscript{3} + d\textsubscript{4} & 0 & d\textsubscript{5} + d\textsubscript{6} \\ \hline
+ 	 \textbf{Estimator} & \textbf{KF} & \textbf{EKF} & \textbf{UKF} \\ \hline
+ 	 \textbf{Pole Starting Angles}  & \multicolumn{3}{|c|}{5$^{\circ}$, 15$^{\circ}$, 60$^{\circ}$} \\ \hline
+ 	 \textbf{Sensors} & x; x and $\dot\theta$ & \multicolumn{2}{|c|}{x and $\dot\theta$} \\ \hline
+ 	 \textbf{Q Scaling}  & \multicolumn{3}{|c|}{Q, 0.001Q, 0.1Q, 10Q} \\ \hline
  \end{tabular}
- \caption{D-H Parameters}
- \label{table:1}
+ \caption{Offline Test Cases}
+ \label{table:offlinecases}
  \end{table}
-
+The comparison varying the number of sensors was restricted to the KF because the results made it clear that a single sensor had poor performance, as seen in Figure \ref{fig:sensorsKF}.  The results did demonstrate that additional sensors will improve results, even if a sensor is noisy.  In this case, the addition of a second sensor improves the pole angle estimation and it follows the ground truth well.  All of the following test cases used two sensors.
+\begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width=10cm,keepaspectratio]{SensorsKF.png}
+ 	\caption{Comparison of KF Results for a Single Sensor and Two Sensors (Pole starting angle = 5$^{\circ}$, Scaling = Q)}
+ 	\label{fig:sensorsKF}
+ \end{figure}
+ 
+ The next test case compared the use of linear (KF) and nonlinear estimators (EKF) for a small starting pole angle ($\theta$ = 5$^{\circ}$).  As seen in Figure \ref{fig:5degKFvEKF}, the EKF follows the ground truth closer than the KF and the difference is likely due to the linearization errors in the KF.  The performance of the KF is relatively close to the EKF, as their RMSE is the same order of magnitude, 9.86 x 10$^{-4}$ and 3.10 x 10$^{-4}$, respectively.
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width=15cm,keepaspectratio]{5degKFvEKF.png}
+ 	\caption{Comparison of KF and EKF (Pole starting angle = 5$^{\circ}$, Scaling = Q). \textbf{A} Estimation of pole angle \textbf{B} Error distribution \textbf{C} Estimated variance of the estimation}
+ 	\label{fig:5degKFvEKF}
+ \end{figure}
 \subsection{Online Results}
 \subsubsection{KF, EKF for large angles}
 With two sensor measurements, both KF and EKF work fine to stabilize the system around equilibrium position. However, if we decrease estimation of process noise estimation Q, which means to trust dynamic model more in estimation, we found that KF will not generate desired estimates to make the controller come to stable position. The online running result for KF and EKF is shown in Figure \ref{fig:onlineKFvsEKF}. 
@@ -440,7 +455,7 @@ In simulation, with different estimators, starting angles and sensors, multiple 
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{ |l |c  |c |c | c|}
 		\hline
-		\multirow{\textbf{Estimators}} & \multicolumn{2}{|c|}{\textbf{One Measurement}} & \multicolumn{2}{|c|}{\textbf{Two Measurements}} \\ \cline{2-5}
+		\multirow{2}{*}{\textbf{Estimators}} & \multicolumn{2}{|c|}{\textbf{One Measurement}} & \multicolumn{2}{|c|}{\textbf{Two Measurements}} \\ \cline{2-5}
 		& $\sigma = 0.02$ & $\sigma=0.004$(self tuning) & $\hat{Q} = Q$ & $\hat{Q} = 0.001Q$ \\ \hline
 		\textbf{KF} & None & $10^\circ{}$ & $60^\circ{}$ & $45^\circ{}$ \\ \hline
 		\textbf{EKF} & None & $30^\circ{}$ & $63^\circ{}$ & $63^\circ{}$ \\ \hline
@@ -452,6 +467,7 @@ In simulation, with different estimators, starting angles and sensors, multiple 
 
 
 \section{Conclusions}
+This project focused on 
 
 \section{References}
 
@@ -485,7 +501,8 @@ CA^2 \\
 CA^3
 \end{bmatrix}
 \end{equation}
-This matrix was also full rank, which was perplexing. Professor Lin then suggested that we check the condition number of the observability matrix. Using the MATLAB command cond(), we evaluated cond($\mathcal{O}$) = $6.67e-5$, which suggests that the observability matrix is almost singular. This was the source of some of our problems in implementing our state estimators. Based on this information, we attempted to add another sensor at the pole angular rate. After doing this, the condition number of the observability matrix was $60.437$, a much more reasonable number.
+
+This matrix was also full rank, which was perplexing. Professor Lin then suggested that we check the condition number of the observability matrix. Using the MATLAB command cond(), we evaluated cond($\mathcal{O}$) = $6.67e+5$, which suggests that the observability matrix is almost singular. I think you and Sarah need to collaborate for the This was the source of some of our problems in implementing our state estimators. Based on this information, we attempted to add another sensor at the pole angular rate. After doing this, the condition number of the observability matrix was $60.437$, a much more reasonable number.
 \subsection{Details of Process Noise}
 For our system, we inject the process noise from input of system. We assume the input force follows a linear relation with controlling voltage of motor circuit shown as Figure \ref{fig:circuit}.
 \begin{figure}[h!]
@@ -507,5 +524,6 @@ In simulator, we use a discretized Linear Quadratic Regulator to output desired 
 	\caption{iterative Linear Quadratic Regulator (iLQR)}
 	\label{fig:iLQR}
 \end{figure}
+
 \end{document}
 
