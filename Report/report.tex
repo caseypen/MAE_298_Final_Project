@@ -221,11 +221,23 @@ y = \begin{bmatrix}
 \label{eq:1output}
 \end{align}
 
-\subsection{System Parameters Values}
+\subsection{Sensor Noise Characteristics}
 
-A sensor was selected for each measured state, cart position and pole anglular velocity, while trying to balance accuracy and cost. For the cart position, the Garmin LIDAR-Lite v3 was selected for its accuracy of +/-2.5cm and retail cost of \$129.99\cite{lidarSensor}. The sensor noise was then approximated as Gaussian zero-mean with a standard deviation, $\sigma_{v_1}$, equal to the specificed accuracy. To measure the angular rate of the pole, an InvenSense ITG-3200 MEMS gyroscope was selected, and is available from SparkFun for \$24.99. The datasheet\cite{gyroSensor} specifies the RMS noise to be 0.38$\frac{\circ{}}{sec}$. Since RMS noise is equivalent to standard deviation (provided that the noise is zero-mean), the 
+A sensor was selected for each measured state, cart position and pole anglular velocity, while trying to balance accuracy and cost. For the cart position, the Garmin LIDAR-Lite v3 was selected for its accuracy of +/-2cm and retail cost of \$129.99\cite{lidarSensor}. The sensor noise was then approximated as Gaussian zero-mean with a standard deviation, $\sigma_{v_1}$, equal to the specificed accuracy. To measure the angular rate of the pole, an InvenSense ITG-3200 MEMS gyroscope was selected, and is available from SparkFun for \$24.99. The datasheet\cite{gyroSensor} specifies the RMS noise to be $0.38\frac{\circ{}}{sec}=0.0066\frac{rad}{sec}$, and RMS noise is equal to standard $\sigma_v$ deviation provided that the noise is zero-mean. These measurement noise parameters are summarized in Table \ref{table:sensorNoise}.
 
-Based on this information, we selected an initial process and model noise of 
+\begin{table}[h!]
+ \centering
+  \renewcommand{\arraystretch}{1.5}
+ \begin{tabular}{ |c |c |}
+ \hline
+ 	 \textbf{State} & \textbf{Measurement Noise Variance, }$\bm{\sigma_{v_i}^2}$  \\ \hline
+ 	 $x$ & 0.0004 \\ \hline
+ 	 $\dot{\theta}$ & 0.0000440 \\ \hline
+ \end{tabular}
+ \caption{System measurement noise characteristics.}
+ \label{table:sensorNoise}
+ \end{table}
+Based on this information, we assume the noise to be Gaussian zero mean
 \begin{equation}
 \begin{aligned}
 w_k \sim N(0,\sigma_w^2) \\
@@ -565,7 +577,7 @@ CA^3
 \end{equation}
 
 This matrix was also full rank, which was perplexing. Professor Lin then suggested that we check the condition number of the observability matrix. Using the MATLAB command cond(), we evaluated cond($\mathcal{O}$) = $6.67e+5$, which suggests that the observability matrix is almost singular. I think you and Sarah need to collaborate for the This was the source of some of our problems in implementing our state estimators. Based on this information, we attempted to add another sensor at the pole angular rate. After doing this, the condition number of the observability matrix was $60.437$, a much more reasonable number.
-\subsection{Details of Process Noise}
+\subsection{Details of Process Noise}\label{appendix:processNoise}
 For our system, we inject the process noise from input of system. We assume the input force follows a linear relation with controlling voltage of motor circuit shown as Figure \ref{fig:circuit}.
 \begin{figure}[h!]
 	\centering
