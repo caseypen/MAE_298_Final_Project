@@ -378,7 +378,7 @@ Then we use nonlinear discrete model from Equation \ref{eq:nonlinear_discrete} t
 \begin{equation}
 \hat{\matr{P}}_{k|k-1}=\frac{1}{2n}\sum_{i}^{2n}(\hat{\matr{X}^{(i)}_{k|k-1}}-\hat{\matr{X}_{k|k-1}})(\hat{\matr{X}^{(i)}_{k|k-1}}-\hat{\matr{X}_{k|k-1}})^T + \matr{Q}_{k-1}
 \end{equation}
-Notice that the estimation of process noise is still added at each step of model prediction. Therefore if we only use open loop estimation, the variance will not converge. In measurement update, we follow the similar steps of unscented transformation in model prediction, but using measurement function $h_k(x)$ to propagate 2n $\sigma$ points to obtain 2n estimated measurement points through output state space function. Then we need to calculate mean, variance $\matr{P}_y$ and covariance $\matr{P}_{xy}$ of transformed $\sigma$ points. With them, posterior state estimation can be obtained from equation below.
+Notice that the estimation of process noise is still added at each step of model prediction. Therefore if we only use open loop estimation, the variance will not converge. In measurement update, we follow the similar steps of unscented transformation in model prediction, but using measurement function $h_k(x)$ to propagate 2n $\sigma$ points to obtain 2n estimated measurement points through output state space function. Then we need to calculate mean, variance $\matr{P}_y+R_k$ and covariance $\matr{P}_{xy}$ of transformed $\sigma$ points. With them, posterior state estimation can be obtained from equation below.
 \begin{equation}
 	\hat{\matr{X}}_{k|k} = 	\hat{\matr{X}}_{k|k-1} + \matr{P}_{xy} \matr{P}^{-1}_{y}(\matr{y_k}-\hat{\matr{y}}_{k|k-1})
 \end{equation}
@@ -386,7 +386,25 @@ Notice that the estimation of process noise is still added at each step of model
 	\matr{P}_{k|k}=	\matr{P}_{k|k-1} - \matr{P}_{xy}\matr{P}^{-1}_{y}\matr{P}_{xy}^T
 \end{equation}
 \section{Methodology} 
+The system of inverted pendulum is constructed shown as a block diagram in Figure \ref{fig:block_diagram}. Given initial state $X_0$, LQR controller  calculates out optimal input force $F_1$ of current time step input to inverted pendulum system. The system responds to the input and output actual state $\matr{X}_1$ at next time step. The sensor measurement will output state measurement $\matr{y}_1$ give actual states. The input $F_1$ and measurements $\matr{y}_1$ are input to estimator and then output estimated states $\matr{\hat{X}}_2$ given to controller to calculate optimal input in time step $t_2$. The whole system will follows the loop of block diagram like this. The controller will calculate out optimal force only based on estimated states. The parameters are not tuned for different estimator to show the performance of different estimators in the real time system. In simulation, the benchmark of system performance is actual states input to the controller.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=10cm,keepaspectratio]{SystemArchitecture.png}
+	\caption{Block diagram of our system}
+	\label{fig:block_diagram}
+\end{figure}
+We build up a simulator to include all the components in our system. The estimator is going to be tested online coupled with all the other blocks. After each time of running, the simulation will record data of actual states, inputs and sensor measurements in all time steps. Then with those offline data, different estimators are running to compare their performance with the same inputs. 
 
+\subsection{Simulation description}
+Our simulation is constructed based upon a simulator in OpenAI Gym \cite{OpenAI}. We changed parameters of the system in original simulator and input constraints. Process noise and measurement outputs are also added based on the system evaluation introduced in the previous chapters. The visualization of simulator is shown in Figure \ref{fig:simulator}.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=10cm,keepaspectratio]{Simulator.jpg}
+	\caption{Visualization of simulator}
+	\label{fig:simulator}
+\end{figure}
+\subsection{Expected results}
+The whole simulation running based on discretized nonlinear system following Equations \ref{eq:nonlinear_discrete}. In small starting angles ($\theta<10^o$), the nonlinearity of system is not very severe, so the performance of KF should work fine. The estimated error of three estimators can be comparable. However, when the starting angle is increased, the linearity error of linearized system around equilibrium position will rise. As a result, KF will not perform well, while EKF and UKF will work much better in nonlinear case. For online testing, estimating states of KF in large starting angle condition will fail the controller, while EKF and UKF still get controller work fine. Likewise, in offline testing, the estimated error of KF will be larger than UKF and EKF in large starting angle of our system.
 \section{Results}
 \subsection{Offline Results}
 
@@ -409,6 +427,7 @@ The offline test cases were constructed to evaluate linear and nonlinear estimat
 \subsection{Online Results}
 
 \section{Conclusions}
+This project focused on 
 
 \section{References}
 
@@ -442,7 +461,7 @@ CA^2 \\
 CA^3
 \end{bmatrix}
 \end{equation}
-This matrix was also full rank, which was perplexing. Professor Lin then suggested that we check the condition number of the observability matrix. Using the MATLAB command cond(), we evaluated cond($\mathcal{O}$) = $6.67e-5$, which suggests that the observability matrix is almost singular. This was the source of some of our problems in implementing our state estimators. Based on this information, we attempted to add another sensor at the pole angular rate. After doing this, the condition number of the observability matrix was $60.437$, a much more reasonable number.
+This matrix was also full rank, which was perplexing. Professor Lin then suggested that we check the condition number of the observability matrix. Using the MATLAB command cond(), we evaluated cond($\mathcal{O}$) = $6.67e+5$, which suggests that the observability matrix is almost singular. I think you and Sarah need to collaborate for the This was the source of some of our problems in implementing our state estimators. Based on this information, we attempted to add another sensor at the pole angular rate. After doing this, the condition number of the observability matrix was $60.437$, a much more reasonable number.
 
 \end{document}
 
