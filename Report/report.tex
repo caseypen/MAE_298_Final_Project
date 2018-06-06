@@ -272,7 +272,7 @@ where,
 \gamma &= J(M+m)+mMl^2 \\
 J &= \frac{1}{3}ml^2
 \end{align*}
-This equation, when placed along with Equation \ref{eq:1output} is a representation of the familiar linear state-space form
+This equation, when placed alongside the output equation (Equation \ref{eq:1output}), is a representation of the familiar linear state-space form
 \begin{equation*}
 \begin{aligned}
 \matr{\dot{x}} &= \matr{A}\matr{x} + \matr{B}u \\
@@ -343,9 +343,9 @@ x_{k+1} \\[8pt]
 \dot{\theta}_{k+1}
 \end{bmatrix} &= \begin{bmatrix}
 x_k + \dot{x}_k \Delta t \\
-\dot{x}_k + \biggr(\frac{F+ml\dot{\theta}_k^2\sin\theta_k}{M+m} -\frac{ml\cos\theta_k}{m+M}\frac{mgl\sin\theta_k- \frac{ml}{M+m} F\cos\theta_k -\frac{m^2l^2}{m+M}\dot{\theta}_k^2\sin\theta_k\cos\theta_k}{J+ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta_k}\biggr) \Delta t  \\
+\dot{x}_k + \biggr(\frac{F+ml\dot{\theta}_k^2\sin\theta_k}{M+m} -\frac{ml\cos\theta_k}{m+M}\frac{mgl\sin\theta_k- \frac{ml}{M+m} F\cos\theta_k -\frac{m^2l^2}{m+M}\dot{\theta}_k^2\sin\theta_k\cos\theta_k}{\frac{4}{3}ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta_k}\biggr) \Delta t  \\
 \theta_k + \dot{\theta}_k \Delta t \\
-\dot{\theta}_k + \biggr(\frac{mgl\sin\theta_k - \frac{ml}{M+m} F\cos\theta_k -\frac{m^2l^2}{m+M}\dot{\theta}_k^2\sin\theta_k\cos\theta_k}{J+ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta_k}\biggr) \Delta t
+\dot{\theta}_k + \biggr(\frac{mgl\sin\theta_k - \frac{ml}{M+m} F\cos\theta_k -\frac{m^2l^2}{m+M}\dot{\theta}_k^2\sin\theta_k\cos\theta_k}{\frac{4}{3}ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta_k}\biggr) \Delta t
 \end{bmatrix}
 \end{aligned}
 \label{eq:nonlinear_discrete}
@@ -363,6 +363,20 @@ Next, the Jacobian of the above equation will be evaluated at each time step
 \end{aligned}
 \label{eq:jacobian_EKF}
 \end{align}
+where
+\begin{align*}
+\frac{\partial \dot{\theta}_{k+1}}{\partial \theta_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}} &= \
+\frac{(mgl\cos\theta + \frac{ml}{m+M}u_k\sin\theta_k - \frac{m^2l^2}{m+M}\dot{\theta}_k^2(\cos^2\theta_k-\sin^2\theta_k))den - num(2\frac{m^2l^2}{m+M}\cos\theta_k\sin\theta_k)}{den^2} \\
+\frac{\partial \dot{\theta}_{k+1}}{\partial \dot{\theta}_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}} &=\
+-\frac{\frac{2m^2l^2}{m+M}\dot{\theta}_k\sin\theta_k\cos\theta_k}{den} \\
+\frac{\partial \dot{x}_{k+1}}{\partial \theta_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}} &=\
+-\frac{ml}{m+M}(-\sin\theta_k \frac{num}{den} + \cos\theta_k\frac{\partial \dot{\theta}_{k+1}}{\partial \theta_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}}) + \frac{ml}{m+M}\dot{\theta}_k\sin\theta_k \\
+\frac{\partial \dot{\theta}_{k+1}}{\partial \dot{\theta}_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}} &=\
+-\frac{ml}{m+M}\cos\theta_k\frac{\partial \dot{\theta}_{k+1}}{\partial \dot{\theta}_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}} + \frac{2ml}{m+M}\dot{\theta}_k\sin\theta_k \\
+num &= mgl\sin\theta_k - \frac{ml}{M+m} F\cos\theta_k -\frac{m^2l^2}{m+M}\dot{\theta}_k^2\sin\theta_k\cos\theta_k \\
+den &= \frac{4}{3}ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta_k
+\end{align*}
+and all references to state variables from time step $k$ are inserted from the $k-1$ previous time step estimate.
 Using Equation \ref{eq:jacobian_EKF}, the \textit{a priori} covariance update, $\matr{P}_{k|k-1}$, is computed as
 \begin{equation}
 \matr{P}_{k|k-1} = \matr{A}'_{k-1} \matr{P}_{k-1|k-1} {\matr{A}'}_{k-1}^T + \matr{Q}
