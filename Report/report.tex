@@ -425,6 +425,7 @@ The offline test cases were constructed to evaluate linear and nonlinear estimat
 \subsection{Online Results}
 
 \section{Conclusions}
+This project focused on 
 
 \section{References}
 
@@ -458,7 +459,7 @@ CA^2 \\
 CA^3
 \end{bmatrix}
 \end{equation}
-This matrix was also full rank, which was perplexing. Professor Lin then suggested that we check the condition number of the observability matrix. Using the MATLAB command cond(), we evaluated cond($\mathcal{O}$) = $6.67e-5$, which suggests that the observability matrix is almost singular. This was the source of some of our problems in implementing our state estimators. Based on this information, we attempted to add another sensor at the pole angular rate. After doing this, the condition number of the observability matrix was $60.437$, a much more reasonable number.
+This matrix was also full rank, which was perplexing. Professor Lin then suggested that we check the condition number of the observability matrix. Using the MATLAB command cond(), we evaluated cond($\mathcal{O}$) = $6.67e+5$, which suggests that the observability matrix is almost singular. I think you and Sarah need to collaborate for the This was the source of some of our problems in implementing our state estimators. Based on this information, we attempted to add another sensor at the pole angular rate. After doing this, the condition number of the observability matrix was $60.437$, a much more reasonable number.
 
 \end{document}
 
