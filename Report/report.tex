@@ -137,7 +137,7 @@ The model used for our analysis is a 2 degree-of-freedom system (see Figure \ref
  	\caption{System Diagram}
  	\label{fig:sys_diagram}
  \end{figure}
-Using the above assumptions, we derived the non-linear equations of motion using Newton's second law.
+Using the above assumptions, we derived the non-linear equations of motion using Newton's second law.  The description of the parameters and their values are given in Table \ref{table:paramvalues}.
 \begin{equation}
 \begin{aligned}
 \frac{4}{3}l \ddot{\theta} &= g \sin \theta - \cos \theta \ddot{x} \\
@@ -145,6 +145,24 @@ Using the above assumptions, we derived the non-linear equations of motion using
 \end{aligned}
 \label{eq:EOM_nonlinear}
 \end{equation}
+\begin{table}[h!]
+ \centering
+ \begin{tabular}{ |c |c  |l |}
+ \hline
+ 	 \textbf{Parameter} & \textbf{Value} & \textbf{Description}  \\ \hline
+ 	 M & 0.94 & Mass of the cart, kg \\ \hline
+ 	 m & 0.23 & Mass of the pole, kg \\ \hline
+ 	 l & 0.3302 & Distance along pole from pivot to center of mass, m \\ \hline
+ 	 g & 0.98 & Acceleration due to gravity, m/{sec\textsuperscript{2}} \\ \hline
+ 	 F & --- & Force applied to the cart, N \\ \hline
+ 	 x & --- & Cart position, m \\ \hline
+ 	 \.x & --- & Cart velocity, m/sec \\ \hline
+ 	 $\theta$ & --- & Angle of pole, rad \\ \hline
+ 	 $\dot\theta$ & --- & Angular velocity of pole, rad/sec \\ \hline
+ \end{tabular}
+ \caption{System Parameters (values from \cite{lab6})}
+ \label{table:paramvalues}
+ \end{table}
 These can be rearranged into the nonlinear continuous-time first-order system of equations
 \begin{equation}
 \begin{aligned}
@@ -203,7 +221,7 @@ Equations \ref{eq:ss_continuous} and \ref{eq:1output} are representations of the
 \end{equation}
 
 \subsection{System Parameters Values}
-
+\cite{lab6}
 A sensor was selected for each measured state, cart position and pole anglular velocity, while trying to balance accuracy and cost.
 
 Based on this information, we selected an initial process and model noise of
