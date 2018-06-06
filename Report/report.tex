@@ -42,6 +42,7 @@
 \MakeOuterQuote{"}
 \usepackage{multirow}
 \usepackage{multicol}
+\usepackage{placeins}%enables use of \FloatBarrier to protect floats (tables, figs) from passing the barrier
 
 % Margins
 \topmargin=-0.45in
@@ -141,7 +142,7 @@ The model used for our analysis is a 2 degree-of-freedom system (see Figure \ref
  	\caption{System Diagram}
  	\label{fig:sys_diagram}
  \end{figure}
-Using the above assumptions, we derived the non-linear equations of motion using Newton's second law.  The description of the parameters and their values are given in Table \ref{table:paramvalues}.
+Using the above assumptions, we derived the non-linear equations of motion\footnote{The equations have no moment of inertia term because assumption (3) results in $J=\frac{1}{12}m(2l)^2$} using Newton's second law.  The description of the parameters and their values are given in Table \ref{table:paramvalues}.
 \begin{equation}
 \begin{aligned}
 \frac{4}{3}l \ddot{\theta} &= g \sin \theta - \cos \theta \ddot{x} \\
@@ -158,7 +159,7 @@ Using the above assumptions, we derived the non-linear equations of motion using
  	 M & 0.94 & Mass of the cart, kg \\ \hline
  	 m & 0.23 & Mass of the pole, kg \\ \hline
  	 l & 0.3302 & Distance along pole from pivot to center of mass, m \\ \hline
- 	 g & 0.98 & Acceleration due to gravity, m/{sec\textsuperscript{2}} \\ \hline
+ 	 g & 9.81 & Acceleration due to gravity, m/{sec\textsuperscript{2}} \\ \hline
  	 F & --- & Force applied to the cart, N \\ \hline
  	 x & --- & Cart position, m \\ \hline
  	 \.x & --- & Cart velocity, m/sec \\ \hline
@@ -168,6 +169,7 @@ Using the above assumptions, we derived the non-linear equations of motion using
  \caption{System Parameters (values from \cite{lab6})}
  \label{table:paramvalues}
  \end{table}
+ \FloatBarrier
 These can be rearranged into the nonlinear continuous-time first-order system of equations
 \begin{equation}
 \begin{aligned}
@@ -184,15 +186,16 @@ These can be rearranged into the nonlinear continuous-time first-order system of
 	\ddot{\theta} \\
 \end{bmatrix} = \begin{bmatrix}
 \dot{x} \\
-\frac{F+ml\dot{\theta}^2\sin\theta}{M+m} -\frac{ml\cos\theta}{m+M}\frac{mgl\sin\theta- \frac{ml}{M+m} F\cos\theta -\frac{m^2l^2}{m+M}\dot{\theta}^2\sin\theta\cos\theta}{J+ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta} \\[6pt]
+\frac{F+ml\dot{\theta}^2\sin\theta}{M+m} -\frac{ml\cos\theta}{m+M}\frac{mgl\sin\theta- \frac{ml}{M+m} F\cos\theta -\frac{m^2l^2}{m+M}\dot{\theta}^2\sin\theta\cos\theta}{\frac{4}{3}ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta} \\[6pt]
 \dot{\theta} \\
-\frac{mgl\sin\theta - \frac{ml}{M+m} F\cos\theta -\frac{m^2l^2}{m+M}\dot{\theta}^2\sin\theta\cos\theta}{J+ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta }
+\frac{mgl\sin\theta - \frac{ml}{M+m} F\cos\theta -\frac{m^2l^2}{m+M}\dot{\theta}^2\sin\theta\cos\theta}{\frac{4}{3}ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta }
 \end{bmatrix}
 \end{aligned}
 \label{eq:nonlinear_ss_continuous}
 \end{equation}
+After rearranging into this form, the states of the system (the variables in vector $\matr{x}$) become evident. A description of each of the elements of the state vector is included in Table \ref{table:paramvalues}. No manipulation to the state equations is necessary since $\theta$, the critical output to be estimated, is already one of the states.\\
 
-The original intention was to compare the performance of the estimators when using a single sensor to measure cart position (see Equation \ref{eq:singleoutput}) and two sensors for cart position and pole angular rate (see Equation \ref{eq:1output}. 
+The original intention was to compare the performance of the estimators when using a single sensor to measure cart position (see Equation \ref{eq:singleoutput}) and two sensors for cart position and pole angular rate (see Equation \ref{eq:1output}). 
  \begin{align}
  y = \begin{bmatrix}
  1 & 0 & 0 & 0 \\
@@ -204,7 +207,7 @@ The original intention was to compare the performance of the estimators when usi
  \end{bmatrix}
  \label{eq:singleoutput}
  \end{align}
- It was determined that cart position was the only state that could be measured by itself and result in a full-rank observability matrix $\mathcal{O}$. However, significantly poor performance led to further analysis (See Appendix \ref{observ}) and it was determined that all subsequent estimators should be built using measurements from two states, one of which was the cart position. Pole angular rate was selected as the second measurement, resulting in the output equation:
+ It was determined that cart position was the only state that could be measured by itself and result in a full-rank observability matrix, $\mathcal{O}$. However, significantly poor performance led to further analysis (See Appendix \ref{appendix:ctrb_obsv}) and it was determined that all subsequent estimators should be built using measurements from two states, one of which was the cart position. Pole angular rate was selected as the second measurement, resulting in the output equation:
 \begin{align}
 y = \begin{bmatrix}
 1 & 0 & 0 & 0 \\
@@ -217,13 +220,6 @@ y = \begin{bmatrix}
 \end{bmatrix}
 \label{eq:1output}
 \end{align}
-Equations \ref{eq:ss_continuous} and \ref{eq:1output} are representations of the familiar linear state-space form
-\begin{equation}
-\begin{aligned}
-\matr{\dot{x}} &= \matr{A}\matr{x} + \matr{B}u \\
-\matr{y} &= \matr{C}\matr{x}
-\end{aligned}
-\end{equation}
 
 \subsection{System Parameters Values}
 
@@ -276,6 +272,13 @@ where,
 \gamma &= J(M+m)+mMl^2 \\
 J &= \frac{1}{3}ml^2
 \end{align*}
+This equation, when placed along with Equation \ref{eq:1output} is a representation of the familiar linear state-space form
+\begin{equation*}
+\begin{aligned}
+\matr{\dot{x}} &= \matr{A}\matr{x} + \matr{B}u \\
+\matr{y} &= \matr{C}\matr{x}
+\end{aligned}
+\end{equation*}
 
 After substituting the parameter values and discretizing the model\footnote{The Matlab function expm() was used to convert \textbf{A\textsubscript{c}} to \textbf{A} using the appropriate equation and \textbf{B\textsubscript{c}} to \textbf{B}. }, 
 the resulting Discretized Linear State Space Model is:
@@ -504,7 +507,7 @@ This project focused on
 
 \pagebreak
 \section{Appendices}
-\subsection{Controllability and Observability}\label{observ}
+\subsection{Controllability and Observability}\label{appendix:ctrb_obsv}
 \label%latex
 To check observability $\mathcal{O}$ and controllability $\mathcal{C}$, we constructed their respective matrices from the linear discrete time state space model using
 \begin{equation}
