@@ -113,45 +113,6 @@
 \listoftables
 \newpage
 
-\section{Examples}
-Test as seen in \cite{kane}
-
-Example superscript JACO\textsuperscript{2} Example citation \cite{weisz2017assistive}
-
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=5cm,keepaspectratio]{kinova.png}
-	\caption{JACO\textsuperscript{2} 6-DOF Manipulator}
-	\label{fig:diagram1}
-\end{figure}
-
-Example Figure \ref{fig:diagram1} Example symbols $\epsilon$. Example table
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{ |c |c  |c |c |c  |c  |c |}
-\hline
-	 i & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
-	 a\textsubscript{i} & 0 & d\textsubscript{2} & 0 & 0 & 0 & 0 \\ \hline
-	 $\alpha$\textsubscript{i}  & -90 & 0 & -90 & 90 & -90 & 0 \\ \hline
-	 $\theta$\textsubscript{i} & $\theta$\textsubscript{1} & $\theta$\textsubscript{2} & $\theta$\textsubscript{3} & $\theta$\textsubscript{4} & $\theta$\textsubscript{5} & $\theta$\textsubscript{6} \\ \hline
-	 s\textsubscript{i} & -d\textsubscript{1} & 0 & $\epsilon$\ &  d\textsubscript{3} + d\textsubscript{4} & 0 & d\textsubscript{5} + d\textsubscript{6} \\ \hline
-\end{tabular}
-\caption{D-H Parameters}
-\label{table:1}
-\end{table}
-
-Example matrix with no equation number
-\[
-A_{1} = 
-\begin{bmatrix}
-	C\theta_{1} & 0 & -S\theta_{1} & 0 \\
-	S\theta_{1} & 0 & C\theta_{1} & 0  \\
-	0 & -1 & 0 & -d_{1} \\
-	0 & 0 & 0 & 1 \\ 
-\end{bmatrix}
-\]
-
 \section{Introduction}
 
  The inverted pendulum is a common system that has been well-studied in dynamics and controls.  The identifying characteristic of these systems is that the center of mass is above the pivot point resulting in an inherently unstable system.  Examples of inverted pendulum systems range from humans, where the feet are considered the pivot point, to the self-balancing Segway.  These systems are nonlinear and require a feedback control loop and state estimation in order to balance or stabilize the system, such that the center of mass remains directly above the pivot point.  Any displacement from this configuration will result in the center of mass moving to a new equilibrium at the lowest potential energy.  The center of mass can be repositioned above the pivot point by a control system that applies a restorative force.  It is critical to provide the controller with accurate state estimations in order to calculate the appropriate restorative force.  Inaccurate state estimation can destabilize the system leading to large oscillations or an undesirable state, such as the Segway falling onto the ground.
@@ -159,13 +120,9 @@ A_{1} =
  This project used a pole on a cart model as an inverted pendulum system and investigated the use of different estimators: the Kalman Filter (KF), the Extended Kalman Filter, and the Unscented Kalman Filter.  Since the KF is used for linearized systems, it is hypothesized that its performance will degrade at larger angles as the small angle approximation will be used to linearize the equations of motion.  The project also tested the use of a single sensor and two sensors, and it is expected that two sensors will yield a more accurate estimation of the states.  Finally, this project evaluated the RMSE (root mean square error) and run time across estimators (KF, EKF, UKF) with different tuning.  The following sections discuss the system, state space models, test cases, results, and conclusions.
 
 \section{Derivation of Continuous State Space Model}
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=5cm,keepaspectratio]{SystemDiagram.png}
-	\caption{System Diagram}
-	\label{fig:sys_diagram}
-\end{figure}
-The model used for our analysis is a 2 degree-of-freedom system. It includes a rigid pole that has a single axis of rotation, and is attached to the cart with a pin-joint. The cart has a single translational axis corresponding to the ground plane. The underlying assumptions of this model are:
+\subsection{Description of System and Assumptions}
+The model used for our analysis is a 2 degree-of-freedom system (see Figure \ref{fig:sys_diagram}). It includes a rigid pole that has a single axis of rotation, and is attached to the cart with a pin-joint. The cart has a single translational axis corresponding to the ground plane. The underlying assumptions of this model are:
+
 \begin{enumerate}
 \item No friction between the ground and the cart wheels
 \item No friction between cart and pole
@@ -174,7 +131,13 @@ The model used for our analysis is a 2 degree-of-freedom system. It includes a r
 \item Cart remains in contact with the ground
 \item Ground is flat and level
 \end{enumerate}
- Using the above assumptions, we derived the non-linear equations of motion using Newton's second law.
+\begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width=5cm,keepaspectratio]{SystemDiagram.png}
+ 	\caption{System Diagram}
+ 	\label{fig:sys_diagram}
+ \end{figure}
+Using the above assumptions, we derived the non-linear equations of motion using Newton's second law.  The description of the parameters and their values are given in Table \ref{table:paramvalues}.
 \begin{equation}
 \begin{aligned}
 \frac{4}{3}l \ddot{\theta} &= g \sin \theta - \cos \theta \ddot{x} \\
@@ -182,6 +145,24 @@ The model used for our analysis is a 2 degree-of-freedom system. It includes a r
 \end{aligned}
 \label{eq:EOM_nonlinear}
 \end{equation}
+\begin{table}[h!]
+ \centering
+ \begin{tabular}{ |c |c  |l |}
+ \hline
+ 	 \textbf{Parameter} & \textbf{Value} & \textbf{Description}  \\ \hline
+ 	 M & 0.94 & Mass of the cart, kg \\ \hline
+ 	 m & 0.23 & Mass of the pole, kg \\ \hline
+ 	 l & 0.3302 & Distance along pole from pivot to center of mass, m \\ \hline
+ 	 g & 0.98 & Acceleration due to gravity, m/{sec\textsuperscript{2}} \\ \hline
+ 	 F & --- & Force applied to the cart, N \\ \hline
+ 	 x & --- & Cart position, m \\ \hline
+ 	 \.x & --- & Cart velocity, m/sec \\ \hline
+ 	 $\theta$ & --- & Angle of pole, rad \\ \hline
+ 	 $\dot\theta$ & --- & Angular velocity of pole, rad/sec \\ \hline
+ \end{tabular}
+ \caption{System Parameters (values from \cite{lab6})}
+ \label{table:paramvalues}
+ \end{table}
 These can be rearranged into the nonlinear continuous-time first-order system of equations
 \begin{equation}
 \begin{aligned}
@@ -205,6 +186,55 @@ These can be rearranged into the nonlinear continuous-time first-order system of
 \end{aligned}
 \label{eq:nonlinear_ss_continuous}
 \end{equation}
+
+The original intention was to compare the performance of the estimators when using a single sensor to measure cart position (see Equation \ref{eq:singleoutput}) and two sensors for cart position and pole angular rate (see Equation \ref{eq:1output}. 
+ \begin{align}
+ y = \begin{bmatrix}
+ 1 & 0 & 0 & 0 \\
+ \end{bmatrix} \begin{bmatrix}
+ 	x \\
+ 	\dot{x} \\
+ 	\theta \\
+ 	\dot{\theta} \\
+ \end{bmatrix}
+ \label{eq:singleoutput}
+ \end{align}
+ It was determined that cart position was the only state that could be measured by itself and result in a full-rank observability matrix $\mathcal{O}$. However, significantly poor performance led to further analysis (See Appendix \ref{observ}) and it was determined that all subsequent estimators should be built using measurements from two states, one of which was the cart position. Pole angular rate was selected as the second measurement, resulting in the output equation:
+\begin{align}
+y = \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1
+\end{bmatrix} \begin{bmatrix}
+	x \\
+	\dot{x} \\
+	\theta \\
+	\dot{\theta} \\
+\end{bmatrix}
+\label{eq:1output}
+\end{align}
+Equations \ref{eq:ss_continuous} and \ref{eq:1output} are representations of the familiar linear state-space form
+\begin{equation}
+\begin{aligned}
+\matr{\dot{x}} &= \matr{A}\matr{x} + \matr{B}u \\
+\matr{y} &= \matr{C}\matr{x}
+\end{aligned}
+\end{equation}
+
+\subsection{System Parameters Values}
+\cite{lab6}
+A sensor was selected for each measured state, cart position and pole anglular velocity, while trying to balance accuracy and cost.
+
+Based on this information, we selected an initial process and model noise of
+\begin{equation}
+\begin{aligned}
+w_k \sim N(0,\sigma_w^2) \\
+v_k \sim N(0,\sigma_v^2)
+\end{aligned}
+\end{equation}
+
+\section{Estimators and Resulting Discretized State Space Models}
+\subsection{Kalman Filter (KF)}
+
 In order to implement a linear Kalman Filter, we will need to linearize these equations. Since the unstable portion of the system is directly related to the angle of the pole, it is our desire to keep the pole at the vertical position of 0$^\circ$. Therefore, this angle is the one about which we want to linearize; this is often called a "small angle approximation." This first-order truncation of the trigonometric Taylor series expansions results in the following substitutions to our nonlinear equations:
 \begin{align*}
 \sin \theta &\approx \theta \\
@@ -236,82 +266,12 @@ Making these substitutions and rearranging the equations into matrix form result
 \end{bmatrix} F
 \label{eq:ss_continuous}
 \end{equation}
-where 
+where, 
 \begin{align*}
 \gamma &= J(M+m)+mMl^2 \\
 J &= \frac{1}{3}ml^2
 \end{align*}
-The original intention when applying a Kalman filter to this system was that we would measure just one of the states directly, and use these measurements to estimate the pole angle. We discovered that the only state output that measurement that resulted in a well-conditioned observability matrix $\mathcal{O}$ was the measurement of cart position. However, we ran into problems (See "Controllability and Observability", Appendix), and determined that a better estimator could be built if we measured two states, one of which was the cart position. Therefore, we also chose to measure pole angular rate, resulting in the output equation
-\begin{align}
-y = \begin{bmatrix}
-1 & 0 & 0 & 0 \\
-0 & 0 & 0 & 1
-\end{bmatrix} \begin{bmatrix}
-	x \\
-	\dot{x} \\
-	\theta \\
-	\dot{\theta} \\
-\end{bmatrix}
-\label{eq:1output}
-\end{align}
-Equations \ref{eq:ss_continuous} and \ref{eq:1output} are representations of the familiar linear state-space form
-\begin{equation}
-\begin{aligned}
-\matr{\dot{x}} &= \matr{A}\matr{x} + \matr{B}u \\
-\matr{y} &= \matr{C}\matr{x}
-\end{aligned}
-\end{equation}
-The state that is imperative for accurate measurement is the pole angle. In this pursuit, we want to select the highest accuracy sensors, within a reasonable range of cost. We looked at a few sensors, and \\
 
-Based on this information, we selected an initial process and model noise of
-\begin{equation}
-\begin{aligned}
-w_k \sim N(0,\sigma_w^2) \\
-v_k \sim N(0,\sigma_v^2)
-\end{aligned}
-\end{equation}
-\subsection{Description of System and Assumptions}
-\subsection{System Parameters}
-
-\begin{equation}
-\matr{x} = 
-\begin{bmatrix}
-	x \\
-	\dot{x} \\
-	\theta \\
-	\dot{\theta} \\
-\end{bmatrix}
-\label{xMatrix}
-\end{equation}
-
-\begin{equation}
-\beta = \dfrac{4}{3} - \dfrac{m}{M+m}
-\end{equation}
-
-\begin{equation}
-\matr{A} = 
-\begin{bmatrix}
-	1 & \tau & 0 & 0 \\
-	0 & 1 & \dfrac{-gm\tau}{(M+m)\beta} & 0 \\
-	0 & 0 & 1 & \tau \\
-	0 & 0 & \dfrac{g\tau}{l\beta} & 1 \\
-\end{bmatrix}
-\label{aMatrix}
-\end{equation}
-
-\begin{equation}
-\matr{A} = 
-\begin{bmatrix}
-	1 & \tau & 0 & 0 \\
-	0 & 1 & \dfrac{-gm\tau}{(M+m)\beta} & 0 \\
-	0 & 0 & 1 & \tau \\
-	0 & 0 & \dfrac{g\tau}{l\beta} & 1 \\
-\end{bmatrix}
-\label{aMatrix}
-\end{equation}
-
-\section{Estimators and Resulting Discretized State Space Models}
-\subsection{Kalman Filter (KF)}
 \subsection{Extended Kalman Filter (EKF)}
 PUT THIS ABOVE:
 The intuition that the system is unstable can be verified by checking the stability criterion
@@ -391,6 +351,21 @@ Notice that the estimation of process noise is still added at each step of model
 
 \section{Results}
 \subsection{Offline Results}
+
+\begin{table}[h!]
+ \centering
+ \begin{tabular}{ |c |c  |c |c |c  |c  |c |}
+ \hline
+ 	 i & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
+ 	 a\textsubscript{i} & 0 & d\textsubscript{2} & 0 & 0 & 0 & 0 \\ \hline
+ 	 $\alpha$\textsubscript{i}  & -90 & 0 & -90 & 90 & -90 & 0 \\ \hline
+ 	 $\theta$\textsubscript{i} & $\theta$\textsubscript{1} & $\theta$\textsubscript{2} & $\theta$\textsubscript{3} & $\theta$\textsubscript{4} & $\theta$\textsubscript{5} & $\theta$\textsubscript{6} \\ \hline
+ 	 s\textsubscript{i} & -d\textsubscript{1} & 0 & $\epsilon$\ &  d\textsubscript{3} + d\textsubscript{4} & 0 & d\textsubscript{5} + d\textsubscript{6} \\ \hline
+ \end{tabular}
+ \caption{D-H Parameters}
+ \label{table:1}
+ \end{table}
+
 \subsection{Online Results}
 
 \section{Conclusions}
@@ -403,7 +378,7 @@ Notice that the estimation of process noise is still added at each step of model
 
 \pagebreak
 \section{Appendices}
-\subsection{Controllability and Observability}
+\subsection{Controllability and Observability}\label{observ}
 \label%latex
 To check observability $\mathcal{O}$ and controllability $\mathcal{C}$, we constructed their respective matrices from the linear discrete time state space model using
 \begin{equation}
@@ -428,12 +403,6 @@ CA^3
 \end{bmatrix}
 \end{equation}
 This matrix was also full rank, which was perplexing. Professor Lin then suggested that we check the condition number of the observability matrix. Using the MATLAB command cond(), we evaluated cond($\mathcal{O}$) = $6.67e-5$, which suggests that the observability matrix is almost singular. This was the source of some of our problems in implementing our state estimators. Based on this information, we attempted to add another sensor at the pole angular rate. After doing this, the condition number of the observability matrix was $60.437$, a much more reasonable number.
-\ref{eq:EOM_nonlinear}
-\subsubsection{junk}
-\begin{dmath}
-	\hat{z_{6}} \times \vec{r_{6}} = \left[\begin{matrix}0\\0\\0\end{matrix}\right]
-\end{dmath}
-
 
 \end{document}
 
