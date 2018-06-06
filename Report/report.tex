@@ -356,10 +356,10 @@ which says that all of the eigenvalues of the system must be less than 1 for the
     0.9029
 \end{bmatrix}
 \end{equation}
-which does not meet the stibility criterion, confirming intuition.
+which does not meet the stibility criterion, confirming intuition.  The system is controllable and observable (See Appendix \ref{appendix:ctrb_obsv} for details), and because the system is observable it is also detectable.  The system only needs to be detectable for the KF.
 
 \subsection{Extended Kalman Filter (EKF)}
-The Extended Kalman Filter differs from the regular Kalman Filter by utilizing the nonlinear discrete time state equations in place of the linear equations. This is accomplished by inserting the \textit{a posteriori} estimates of the states from the previous time step into the discrete nonlinear equations to get the \textit{a priori} estimate of the states at the current time step. This necessitates that the the nonlinear discrete time equations be computed. This is accomplished using first-order Euler approximations of the continuous time versions (Equation \ref{eq:nonlinear_ss_continuous}):
+The Extended Kalman Filter (EKF) differs from the KF by utilizing the nonlinear discrete time state equations in place of the linear equations. This is accomplished by inserting the \textit{a posteriori} estimates of the states from the previous time step into the discrete nonlinear equations to get the \textit{a priori} estimates of the states at the current time step. This necessitates that the the nonlinear discrete time equations be computed. This is accomplished using the first-order Euler approximations of the continuous time equations (Equation \ref{eq:nonlinear_ss_continuous}):
 \begin{equation}
 \begin{aligned}
 \matr{x}_{k+1} &= \matr{f}_k (\matr{x}_k,u_k) \\
@@ -377,7 +377,7 @@ x_k + \dot{x}_k \Delta t \\
 \end{aligned}
 \label{eq:nonlinear_discrete}
 \end{equation}
-Next, the Jacobian of the above equation will be evaluated at each time step
+Next, the Jacobian of Equation \ref{eq:nonlinear_discrete} will be evaluated at each time step:
 \begin{align}
 \begin{aligned}
 \matr{A'}_{k-1} &= \matr{J}\bigr|_{\hat{\matr{x}}_{k-1|k-1}} \\
@@ -390,17 +390,17 @@ Next, the Jacobian of the above equation will be evaluated at each time step
 \end{aligned}
 \label{eq:jacobian_EKF}
 \end{align}
-where
+where,
 \begin{align*}
 \frac{\partial \dot{\theta}_{k+1}}{\partial \theta_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}} &= \
-\frac{(mgl\cos\theta + \frac{ml}{m+M}u_k\sin\theta_k - \frac{m^2l^2}{m+M}\dot{\theta}_k^2(\cos^2\theta_k-\sin^2\theta_k))den - num(2\frac{m^2l^2}{m+M}\cos\theta_k\sin\theta_k)}{den^2} \\
+\frac{(mgl\cos\theta + \frac{ml}{M+m}u_k\sin\theta_k - \frac{m^2l^2}{M+m}\dot{\theta}_k^2(\cos^2\theta_k-\sin^2\theta_k))den - num(2\frac{m^2l^2}{M+m}\cos\theta_k\sin\theta_k)}{den^2} \\
 \frac{\partial \dot{\theta}_{k+1}}{\partial \dot{\theta}_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}} &=\
--\frac{\frac{2m^2l^2}{m+M}\dot{\theta}_k\sin\theta_k\cos\theta_k}{den} \\
+-\frac{\frac{2m^2l^2}{M+m}\dot{\theta}_k\sin\theta_k\cos\theta_k}{den} \\
 \frac{\partial \dot{x}_{k+1}}{\partial \theta_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}} &=\
--\frac{ml}{m+M}(-\sin\theta_k \frac{num}{den} + \cos\theta_k\frac{\partial \dot{\theta}_{k+1}}{\partial \theta_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}}) + \frac{ml}{m+M}\dot{\theta}_k\sin\theta_k \\
+-\frac{ml}{M+m}(-\sin\theta_k \frac{num}{den} + \cos\theta_k\frac{\partial \dot{\theta}_{k+1}}{\partial \theta_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}}) + \frac{ml}{M+m}\dot{\theta}_k\sin\theta_k \\
 \frac{\partial \dot{\theta}_{k+1}}{\partial \dot{\theta}_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}} &=\
--\frac{ml}{m+M}\cos\theta_k\frac{\partial \dot{\theta}_{k+1}}{\partial \dot{\theta}_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}} + \frac{2ml}{m+M}\dot{\theta}_k\sin\theta_k \\
-num &= mgl\sin\theta_k - \frac{ml}{M+m} F\cos\theta_k -\frac{m^2l^2}{m+M}\dot{\theta}_k^2\sin\theta_k\cos\theta_k \\
+-\frac{ml}{M+m}\cos\theta_k\frac{\partial \dot{\theta}_{k+1}}{\partial \dot{\theta}_k}\Big|_{\hat{\matr{x}}_{k-1|k-1}} + \frac{2ml}{M+m}\dot{\theta}_k\sin\theta_k \\
+num &= mgl\sin\theta_k - \frac{ml}{M+m} F\cos\theta_k -\frac{m^2l^2}{M+m}\dot{\theta}_k^2\sin\theta_k\cos\theta_k \\
 den &= \frac{4}{3}ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta_k
 \end{align*}
 and all references to state variables from time step $k$ are inserted from the $k-1$ previous time step estimate.
@@ -410,26 +410,32 @@ Using Equation \ref{eq:jacobian_EKF}, the \textit{a priori} covariance update, $
 \end{equation}
 The rest of the algorithm follows the same process as the linear Kalman Filter.\footnote{Although it is not true in general that the EKF measurement update follows the same process as KF, the absence of nonlinearities in the system output equation, along with unity coefficients (no scaling) on the process and measurement noise, results in the EKF \textit{a posteriori} estimate following exactly the KF \textit{a posteriori} algorithm.}
 \subsection{Unscented Kalman Filter (UKF)}
-When the nonlinearity of dynamic model is serve, the state estimations propagate through linearized model will not be accurate. Though EKF includes nonlinear model in model prediction, it still uses local linearized dynamic model ${\matr{A}'}$ to estimate variance matrix $\matr{P}_{k|k}$ at each time step. However, Unscented Kalman Filter (UKF) has been proved to have better accuracy of mean and variance of state estimation than EKF, especially in serve nonlinear dynamics model. In UKF, the mean and variance are estimated based on sample method. In this project we mainly implemented UKF from paper \cite{moireau2011reduced}. In model prediction, we select 2n sample points ($\sigma$ points) based on current knowledge of states estimation $\matr{\hat{X}_{k-1|k-1}}$ and $\matr{\hat{P}_{k-1|k-1}}$. The 2n sampling points are shown as below two equations.
+When the nonlinearity of a dynamic model is severe, the state estimations propagated through linearized model will not be accurate. Though EKF incorporates a nonlinear model in model prediction, it still uses a local linearized dynamic model ${\matr{A}'}$ to estimate the variance matrix $\matr{P}_{k|k}$ at each time step. However, the Unscented Kalman Filter (UKF) has been shown to have better accuracy of the mean and the variance of state estimation compared to the EKF, especially in severely nonlinear dynamic models. In the UKF, the mean and the variance are estimated based on a sampling method. The implementation of the UKF for this project was based on a paper by Moireau and Chapelle \cite{moireau2011reduced}. In model prediction, 2n sample points were selected ($\sigma$ points) based on the current knowledge of the state estimation $\matr{\hat{X}_{k-1|k-1}}$ and $\matr{\hat{P}_{k-1|k-1}}$. The 2n sampling points are shown in Equations \ref{eq:UKF1} and \ref{eq:UKF2}.
 \begin{equation}
 	\hat{\matr{X}}^{(i)}_{k-1|k-1}+(\sqrt{n\matr{P}_{k-1|k-1}}),\  i=1,2,...n
+\label{eq:UKF1}
 \end{equation}
 \begin{equation}
  \hat{\matr{X}}^{(i)}_{k-1|k-1}-(\sqrt{n\matr{P}_{k-1|k-1}}),\  i=1,2,...n
+\label{eq:UKF2}
 \end{equation}
-Then we use nonlinear discrete model from Equation \ref{eq:nonlinear_discrete} to propagate each $\sigma$ points to get state estimations $\hat{X}_{k|k-1}$. Then we calculate mean and variance of propagated sample points to get $\hat{\matr{X}}_{k|k-1}$ and $\hat{\matr{P}}_{k|k-1}$, with below equations.
+The nonlinear discrete model from Equation \ref{eq:nonlinear_discrete} is used to propagate each $\sigma$ points to get the state estimations $\hat{X}_{k|k-1}$. Then the mean and the variance of propagated sample points are calculated to obtain $\hat{\matr{X}}_{k|k-1}$ and $\hat{\matr{P}}_{k|k-1}$ using Equations \ref{eq:UKF3} and \ref{eq:UKF4}.
 \begin{equation}
  \hat{\matr{X}}_{k|k-1}=\frac{1}{2n}\sum_{i}^{2n}\hat{\matr{X}^{(i)}_{k|k-1}}
+\label{eq:UKF3}
 \end{equation}
 \begin{equation}
 \hat{\matr{P}}_{k|k-1}=\frac{1}{2n}\sum_{i}^{2n}(\hat{\matr{X}^{(i)}_{k|k-1}}-\hat{\matr{X}_{k|k-1}})(\hat{\matr{X}^{(i)}_{k|k-1}}-\hat{\matr{X}_{k|k-1}})^T + \matr{Q}_{k-1}
+\label{eq:UKF4}
 \end{equation}
-Notice that the estimation of process noise is still added at each step of model prediction. Therefore if we only use open loop estimation, the variance will not converge. In measurement update, we follow the similar steps of unscented transformation in model prediction, but using measurement function $h_k(x)$ to propagate 2n $\sigma$ points to obtain 2n estimated measurement points through output state space function. Then we need to calculate mean, variance $\matr{P}_y+R_k$ and covariance $\matr{P}_{xy}$ of transformed $\sigma$ points. With them, posterior state estimation can be obtained from equations below.
+Notice that the estimation of process noise is still added at each step of model prediction. Therefore the variance will not converge for open loop estimation. The measurement update follows steps similar to the unscented transformation in model prediction, but uses the measurement function $h_k(x)$ to propagate 2n $\sigma$ points to obtain 2n estimated measurement points using the output state space function. Then the mean, variance $\matr{P}_y+\matr{R}_k$ and covariance $\matr{P}_{xy}$ of transformed $\sigma$ points are calculated.  The posterior state estimation can then be obtained from Equations \ref{eq:UKF5} and \ref{eq:UKF6}.
 \begin{equation}
 	\hat{\matr{X}}_{k|k} = 	\hat{\matr{X}}_{k|k-1} + \matr{P}_{xy} \matr{P}^{-1}_{y}(\matr{y_k}-\hat{\matr{y}}_{k|k-1})
+\label{eq:UKF5}
 \end{equation}
 \begin{equation}
 	\matr{P}_{k|k}=	\matr{P}_{k|k-1} - \matr{P}_{xy}\matr{P}^{-1}_{y}\matr{P}_{xy}^T
+\label{eq:UKF6}
 \end{equation}
 \section{Methodology} 
 The system of inverted pendulum is constructed shown as a block diagram in Figure \ref{fig:block_diagram}. Given initial state $X_0$, LQR controller  calculates out optimal input force $F_1$ of current time step input to inverted pendulum system. The system responds to the input and output actual state $\matr{X}_1$ at next time step. The sensor measurement will output state measurement $\matr{y}_1$ give actual states. The input $F_1$ and measurements $\matr{y}_1$ are input to estimator and then output estimated states $\matr{\hat{X}}_2$ given to controller to calculate optimal input in time step $t_2$. The whole system will follows the loop of block diagram like this. The controller will calculate out optimal force only based on estimated states. The parameters are not tuned for different estimator to show the performance of different estimators in the real time system. In simulation, the benchmark of system performance is actual states input to the controller.
