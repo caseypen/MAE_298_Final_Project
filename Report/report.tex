@@ -381,7 +381,7 @@ Using Equation \ref{eq:jacobian_EKF}, the \textit{a priori} covariance update, $
 \begin{equation}
 \matr{P}_{k|k-1} = \matr{A}'_{k-1} \matr{P}_{k-1|k-1} {\matr{A}'}_{k-1}^T + \matr{Q}
 \end{equation}
-The rest of the algorithm follows the same process as the linear Kalman Filter. 
+The rest of the algorithm follows the same process as the linear Kalman Filter.\footnote{Although it is not true in general that the EKF measurement update follows the same process as KF, the absence of nonlinearities in the system output equation, along with unity coefficients (no scaling) on the process and measurement noise, results in the EKF \textit{a posteriori} estimate following exactly the KF \textit{a posteriori} algorithm.}
 \subsection{Unscented Kalman Filter (UKF)}
 When the nonlinearity of dynamic model is serve, the state estimations propagate through linearized model will not be accurate. Though EKF includes nonlinear model in model prediction, it still uses local linearized dynamic model ${\matr{A}'}$ to estimate variance matrix $\matr{P}_{k|k}$ at each time step. However, Unscented Kalman Filter (UKF) has been proved to have better accuracy of mean and variance of state estimation than EKF, especially in serve nonlinear dynamics model. In UKF, the mean and variance are estimated based on sample method. In this project we mainly implemented UKF from paper \cite{moireau2011reduced}. In model prediction, we select 2n sample points ($\sigma$ points) based on current knowledge of states estimation $\matr{\hat{X}_{k-1|k-1}}$ and $\matr{\hat{P}_{k-1|k-1}}$. The 2n sampling points are shown as below two equations.
 \begin{equation}
