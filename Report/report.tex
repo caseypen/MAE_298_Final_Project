@@ -128,15 +128,13 @@ The model used for our analysis is a 2 degree-of-freedom system (see Figure \ref
 \item Cart remains in contact with the ground
 \item Ground is flat and level
 \end{enumerate}
-
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=5cm,keepaspectratio]{SystemDiagram.png}
 	\caption{System Diagram}
 	\label{fig:sys_diagram}
 \end{figure}
-
- Using the above assumptions, we derived the non-linear equations of motion using Newton's second law.
+Using the above assumptions, we derived the non-linear equations of motion using Newton's second law.
 \begin{equation}
 \begin{aligned}
 \frac{4}{3}l \ddot{\theta} &= g \sin \theta - \cos \theta \ddot{x} \\
@@ -166,6 +164,7 @@ These can be rearranged into the nonlinear continuous-time first-order system of
 \end{bmatrix}
 \end{aligned}
 \end{equation}
+
 In order to implement a linear Kalman Filter, we will need to linearize these equations. Since the unstable portion of the system is directly related to the angle of the pole, it is our desire to keep the pole at the vertical position of 0$^\circ$. Therefore, this is the angle is the one about which we want to linearize, and this is often called the "small angle approximation." This first-order truncation of the trigonometric Taylor series expansions results in the following substitutions to our nonlinear equations:
 \begin{align*}
 \sin \theta &\approx \theta \\
@@ -197,12 +196,13 @@ Making these substitutions and rearranging the equations into matrix form result
 \end{bmatrix} F
 \label{eq:ss_continuous}
 \end{equation}
-where 
+where,
 \begin{align*}
 \gamma &= J(M+m)+mMl^2 \\
 J &= \frac{1}{3}ml^2
 \end{align*}
-The original intention when applying a Kalman filter to this system was that we would measure just one of the states directly, and use these measurements to estimate the pole angle. We discovered that the only state output that measurement that resulted in a full-rank observability matrix $\mathcal{O}$ was the measurement of cart position. However, we ran into problems (See "Controllability and Observability", Appendix), and determined that a better estimator could be built if we measured two states, one of which was the cart position. Therefore, we also chose to measure pole angular rate, resulting in the output equation
+
+The original intention when applying a Kalman filter to this system was that we would measure just one of the states directly, and use these measurements to estimate the pole angle. We discovered that the only state output that measurement that resulted in a full-rank observability matrix $\mathcal{O}$ was the measurement of cart position. However, we ran into problems (See "Controllability and Observability", Appendix), and determined that a better estimator could be built if we measured two states, one of which was the cart position. Therefore, we also chose to measure pole angular rate, resulting in the output equation:
 \begin{align}
 y = \begin{bmatrix}
 1 & 0 & 0 & 0 \\
@@ -222,6 +222,7 @@ Equations \ref{eq:ss_continuous} and \ref{eq:1output} are representations of the
 \matr{y} &= \matr{C}\matr{x}
 \end{aligned}
 \end{equation}
+
 The state that is imperative for accurate measurement is the pole angle. In this pursuit, we want to select the highest accuracy sensors, within a reasonable range of cost. We looked at a few sensors, and \\
 
 Based on this information, we selected an initial process and model noise of
