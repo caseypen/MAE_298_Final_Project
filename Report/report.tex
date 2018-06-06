@@ -113,45 +113,6 @@
 \listoftables
 \newpage
 
-\section{Examples}
-Test as seen in \cite{kane}
-
-Example superscript JACO\textsuperscript{2} Example citation \cite{weisz2017assistive}
-
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=5cm,keepaspectratio]{kinova.png}
-	\caption{JACO\textsuperscript{2} 6-DOF Manipulator}
-	\label{fig:diagram1}
-\end{figure}
-
-Example Figure \ref{fig:diagram1} Example symbols $\epsilon$. Example table
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{ |c |c  |c |c |c  |c  |c |}
-\hline
-	 i & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
-	 a\textsubscript{i} & 0 & d\textsubscript{2} & 0 & 0 & 0 & 0 \\ \hline
-	 $\alpha$\textsubscript{i}  & -90 & 0 & -90 & 90 & -90 & 0 \\ \hline
-	 $\theta$\textsubscript{i} & $\theta$\textsubscript{1} & $\theta$\textsubscript{2} & $\theta$\textsubscript{3} & $\theta$\textsubscript{4} & $\theta$\textsubscript{5} & $\theta$\textsubscript{6} \\ \hline
-	 s\textsubscript{i} & -d\textsubscript{1} & 0 & $\epsilon$\ &  d\textsubscript{3} + d\textsubscript{4} & 0 & d\textsubscript{5} + d\textsubscript{6} \\ \hline
-\end{tabular}
-\caption{D-H Parameters}
-\label{table:1}
-\end{table}
-
-Example matrix with no equation number
-\[
-A_{1} = 
-\begin{bmatrix}
-	C\theta_{1} & 0 & -S\theta_{1} & 0 \\
-	S\theta_{1} & 0 & C\theta_{1} & 0  \\
-	0 & -1 & 0 & -d_{1} \\
-	0 & 0 & 0 & 1 \\ 
-\end{bmatrix}
-\]
-
 \section{Introduction}
 
  The inverted pendulum is a common system that has been well-studied in dynamics and controls.  The identifying characteristic of these systems is that the center of mass is above the pivot point resulting in an inherently unstable system.  Examples of inverted pendulum systems range from humans, where the feet are considered the pivot point, to the self-balancing Segway.  These systems are nonlinear and require a feedback control loop and state estimation in order to balance or stabilize the system, such that the center of mass remains directly above the pivot point.  Any displacement from this configuration will result in the center of mass moving to a new equilibrium at the lowest potential energy.  The center of mass can be repositioned above the pivot point by a control system that applies a restorative force.  It is critical to provide the controller with accurate state estimations in order to calculate the appropriate restorative force.  Inaccurate state estimation can destabilize the system leading to large oscillations or an undesirable state, such as the Segway falling onto the ground.
@@ -372,6 +333,21 @@ The rest of the algorithm follows the same process as the linear Kalman Filter.
 
 \section{Results}
 \subsection{Offline Results}
+
+\begin{table}[h!]
+ \centering
+ \begin{tabular}{ |c |c  |c |c |c  |c  |c |}
+ \hline
+ 	 i & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
+ 	 a\textsubscript{i} & 0 & d\textsubscript{2} & 0 & 0 & 0 & 0 \\ \hline
+ 	 $\alpha$\textsubscript{i}  & -90 & 0 & -90 & 90 & -90 & 0 \\ \hline
+ 	 $\theta$\textsubscript{i} & $\theta$\textsubscript{1} & $\theta$\textsubscript{2} & $\theta$\textsubscript{3} & $\theta$\textsubscript{4} & $\theta$\textsubscript{5} & $\theta$\textsubscript{6} \\ \hline
+ 	 s\textsubscript{i} & -d\textsubscript{1} & 0 & $\epsilon$\ &  d\textsubscript{3} + d\textsubscript{4} & 0 & d\textsubscript{5} + d\textsubscript{6} \\ \hline
+ \end{tabular}
+ \caption{D-H Parameters}
+ \label{table:1}
+ \end{table}
+
 \subsection{Online Results}
 
 \section{Conclusions}
