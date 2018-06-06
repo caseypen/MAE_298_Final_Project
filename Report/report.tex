@@ -41,6 +41,7 @@
 \usepackage [autostyle, english = american]{csquotes}
 \MakeOuterQuote{"}
 \usepackage{multirow}
+\usepackage{multicol}
 
 % Margins
 \topmargin=-0.45in
@@ -124,7 +125,7 @@
 \section{Derivation of Continuous State Space Model}
 \subsection{Description of System and Assumptions}
 The model used for our analysis is a 2 degree-of-freedom system (see Figure \ref{fig:sys_diagram}). It includes a rigid pole that has a single axis of rotation, and is attached to the cart with a pin-joint. The cart has a single translational axis corresponding to the ground plane. The underlying assumptions of this model are:
-
+\begin{multicols}{2}
 \begin{enumerate}
 \item No friction between the ground and the cart wheels
 \item No friction between cart and pole
@@ -133,6 +134,7 @@ The model used for our analysis is a 2 degree-of-freedom system (see Figure \ref
 \item Cart remains in contact with the ground
 \item Ground is flat and level
 \end{enumerate}
+\end{multicols}
 \begin{figure}[h!]
  	\centering
  	\includegraphics[width=5cm,keepaspectratio]{SystemDiagram.png}
@@ -397,7 +399,7 @@ We build up a simulator to include all the components in our system. The estimat
 
 \subsection{Simulation description}
 Our simulation is constructed based upon a simulator in OpenAI Gym \cite{OpenAI}. We changed parameters of the system in original simulator and input constraints. Process noise and measurement outputs are also added based on the system evaluation introduced in the previous chapters. The visualization of simulator is shown in Figure \ref{fig:simulator}.
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=10cm,keepaspectratio]{Simulator.jpg}
 	\caption{Visualization of simulator}
