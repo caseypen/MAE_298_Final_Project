@@ -430,13 +430,30 @@ The comparison varying the number of sensors was restricted to the KF because th
  	\label{fig:sensorsKF}
  \end{figure}
  
- The next test case compared the use of linear (KF) and nonlinear estimators (EKF) for a small starting pole angle ($\theta$ = 5$^{\circ}$).  As seen in Figure \ref{fig:5degKFvEKF}, the EKF follows the ground truth closer than the KF and the difference is likely due to the linearization errors in the KF.  The performance of the KF is relatively close to the EKF, as their RMSE is the same order of magnitude, 9.86 x 10$^{-4}$ and 3.10 x 10$^{-4}$, respectively.
+ The next test case compared the use of linear (KF) and nonlinear estimators (EKF) for a small starting pole angle ($\theta$ = 5$^{\circ}$).  As seen in Figure \ref{fig:5degKFvEKF}, the EKF follows the ground truth closer than the KF and the difference is likely due to the linearization errors in the KF.  The performance of the KF is relatively close to the EKF, as their RMSE is the same order of magnitude, 9.86 x 10$^{-4}$ rad and 3.10 x 10$^{-4}$ rad, respectively.
  \begin{figure}[h!]
  	\centering
  	\includegraphics[width=15cm,keepaspectratio]{5degKFvEKF.png}
  	\caption{Comparison of KF and EKF (Pole starting angle = 5$^{\circ}$, Scaling = Q). \textbf{A} Estimation of pole angle \textbf{B} Error distribution \textbf{C} Estimated variance of the estimation}
  	\label{fig:5degKFvEKF}
  \end{figure}
+
+ The subsequent test case introduced an additional nonlinear estimator, UKF, and increased the staring pole angle ($\theta$ = 15$^{\circ}$).  In Table \ref{table:rmse}, the estimator performance is assessed by RMSE and the test case run time (i.e. the total time to go through the one test case), where smaller RMSE and run times are better.  The KF RMSE is an order of magnitude larger for all tuning conditions compared to the nonlinear estimators.  As opposed to the test case where the pole starting angle was 5$^{\circ}$, the linearization errors in the KF are affecting its performance enough that it significantly deviates from the nonlinear estimators.  However, the test case run time is an order of magnitude smaller.  The EKF and UKF score similarly for RMSE, but the UKF test case run time is doubled.  This result is expected due to the computational cost of running the UKF.
+ \begin{table}[h!]
+ \centering
+ \renewcommand{\arraystretch}{1.5}
+\begin{tabular}{|c|c|c|c|c|}
+	\hline
+	\multirow{2}{*}{\textbf{Estimator}} & \multicolumn{3}{c|}{\textbf{RMSE, rad}} & \textbf{Test Case Run Time, sec} \\ \cline{2-5}
+	& Q & 0.1Q & 10Q & Q \\ \hline
+	\textbf{KF} & 0.00148 & 0.0072 & 0.00883 & 0.063 \\ \hline
+	\textbf{EKF} & 0.00030 & 0.000402 & 0.000412 & 0.230 \\ \hline
+	\textbf{UKF} & 0.00029 & 0.000303 & 0.000304 & 0.426 \\ \hline
+\end{tabular}
+ \caption{Performance Comparison Across Estimators for a Pole Starting Angle $\theta$ = 15$^{\circ}$}
+ \label{table:rmse}
+ \end{table}
+ 
 \subsection{Online Results}
 
 \section{Conclusions}
