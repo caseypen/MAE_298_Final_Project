@@ -121,11 +121,11 @@
 
  The inverted pendulum is a common system that has been well-studied in dynamics and controls \cite{boubaker2012inverted}.  The identifying characteristic of these systems is that the center of mass is above the pivot point resulting in an inherently unstable system.  Examples of inverted pendulum systems range from humans \cite{winter1995human}, where the feet are considered the pivot point, to the self-balancing Segway \cite{pathak2005velocity}.  These systems are nonlinear and require a feedback control loop and state estimation in order to balance or stabilize the system, such that the center of mass remains directly above the pivot point.  Any displacement from this configuration will result in the center of mass moving to a new equilibrium at the lowest potential energy.  The center of mass can be repositioned above the pivot point by a control system that applies a restorative force.  It is critical to provide the controller with accurate state estimations in order to calculate the appropriate restorative force.  Inaccurate state estimation can destabilize the system leading to large oscillations or an undesirable state, such as the Segway falling onto the ground.
 
- This project used a pole on a cart model as an inverted pendulum system and investigated the use of different estimators: the Kalman Filter (KF), the Extended Kalman Filter, and the Unscented Kalman Filter.  Since the KF is used for linearized systems, it is hypothesized that its performance will degrade at larger angles as the small angle approximation will be used to linearize the equations of motion.  The project also tested the use of a single sensor and two sensors, and it is expected that two sensors will yield a more accurate estimation of the states.  Finally, this project evaluated the RMSE (root mean square error) and run time across estimators (KF, EKF, UKF) with different tuning.  The following sections discuss the system, state space models, test cases, results, and conclusions.
+ This project used a pole on a cart (a.k.a. Cart-Pole) model as an inverted pendulum system and investigated the use of different estimators: the Kalman Filter (KF), the Extended Kalman Filter, and the Unscented Kalman Filter.  Since the KF used a linearized model of the system, it is hypothesized that its performance will degrade at larger angles as the small angle approximation will be used to linearize the equations of motion.  The project also tested the use of a single sensor and two sensors, and it is expected that two sensors will yield a more accurate estimation of the states.  Finally, this project evaluated the RMSE (root mean square error) and run time across estimators (KF, EKF, UKF) with different tuning.  The following sections discuss the system, state space models, test cases, results, and conclusions.
 
 \section{Cart-Pole Inverted Pendulum System}
 \subsection{Description of System and Assumptions}\label{section:systemDescription}
-The model used for our analysis is a 2 degree-of-freedom system (see Figure \ref{fig:sys_diagram}). It includes a rigid pole that has a single axis of rotation, and is attached to the cart with a pin-joint. The cart has a single translational axis corresponding to the ground plane. The underlying assumptions of this model are:
+The model used for our analysis is a 2 degree-of-freedom system (see Figure \ref{fig:sys_diagram}). It includes a rigid pole that has a single axis of rotation and is attached to the cart with a pin-joint. The cart has a single translational axis corresponding to the ground plane. The underlying assumptions of this model are:
 \begin{multicols}{2}
 \begin{enumerate}
 \item No friction between the ground and the cart wheels
@@ -142,7 +142,7 @@ The model used for our analysis is a 2 degree-of-freedom system (see Figure \ref
  	\caption{System Diagram}
  	\label{fig:sys_diagram}
  \end{figure}
-Using the above assumptions, we derived the non-linear equations of motion\footnote{The equations have no moment of inertia term because assumption (3) results in $J=\frac{1}{12}m(2l)^2$} using Newton's second law.  The description of the parameters and their values are given in Table \ref{table:paramvalues}.
+Using the above assumptions, the non-linear equations of motion\footnote{The equations have no moment of inertia term because assumption (3) results in $J=\frac{1}{12}m(2l)^2$.} were derived using Newton's second law (Equation \ref{eq:EOM_nonlinear}).  The description of the parameters and their values are given in Table \ref{table:paramvalues}.
 \begin{equation}
 \begin{aligned}
 \frac{4}{3}l \ddot{\theta} &= g \sin \theta - \cos \theta \ddot{x} \\
@@ -170,7 +170,7 @@ Using the above assumptions, we derived the non-linear equations of motion\footn
  \label{table:paramvalues}
  \end{table}
  \FloatBarrier
-These can be rearranged into the nonlinear continuous-time first-order system of equations
+These can be rearranged into the nonlinear continuous-time first-order system of equations:
 \begin{equation}
 \begin{aligned}
 \matr{\dot{x}} &= \matr{f}(\matr{x},u),\quad  \matr{x} = \begin{bmatrix}
@@ -193,7 +193,7 @@ These can be rearranged into the nonlinear continuous-time first-order system of
 \end{aligned}
 \label{eq:nonlinear_ss_continuous}
 \end{equation}
-After rearranging into this form, the states of the system (the variables in vector $\matr{x}$) become evident. A description of each of the elements of the state vector is included in Table \ref{table:paramvalues}. No manipulation to the state equations is necessary since $\theta$, the critical output to be estimated, is already one of the states.\\
+After rearranging into this form, the states of the system (the variables in vector $\matr{x}$) become evident. A description of each of the elements of the state vector is included in Table \ref{table:paramvalues}. No manipulation to the state equations is necessary since $\theta$, the critical output to be estimated, is already one of the states.
 
 The original intention was to compare the performance of the estimators when using a single sensor to measure cart position (see Equation \ref{eq:singleoutput}) and two sensors for cart position and pole angular rate (see Equation \ref{eq:1output}). 
  \begin{align}
@@ -223,7 +223,7 @@ y = \begin{bmatrix}
 
 \subsection{Noise Characteristics}\label{ssecsensornoise}
 
-A sensor was selected for each measured state, cart position and pole anglular velocity, while trying to balance accuracy and cost. For the cart position, the Garmin LIDAR-Lite v3 was selected for its accuracy of +/-2cm and retail cost of \$129.99\cite{lidarSensor}. The sensor noise was then approximated as Gaussian zero-mean with a standard deviation, $\sigma_{v_1}$, equal to the specificed accuracy. To measure the angular rate of the pole, an InvenSense ITG-3200 MEMS gyroscope was selected, and is available from SparkFun for \$24.99. The datasheet\cite{gyroSensor} specifies the RMS noise to be $0.38\frac{\circ{}}{sec}=0.0066\frac{rad}{sec}$, and RMS noise is equal to standard $\sigma_v$ deviation provided that the noise is zero-mean. These measurement noise parameters are summarized in Table \ref{table:sensorNoise}.
+A sensor was selected for each measured state, cart position and pole anglular velocity, while trying to balance accuracy and cost. For the cart position, the Garmin LIDAR-Lite v3 was selected for its accuracy of +/-2 cm and retail cost of \$129.99\cite{lidarSensor}. The sensor noise was then approximated as Gaussian zero-mean with a standard deviation, $\sigma_{v_1}$, equal to the specificed accuracy. To measure the angular rate of the pole, an InvenSense ITG-3200 MEMS gyroscope was selected, and is available from SparkFun for \$24.99. The datasheet\cite{gyroSensor} specifies the RMS noise to be $0.38\frac{\circ{}}{sec}=0.0066\frac{rad}{sec}$, and RMS noise is equal to standard $\sigma_v$ deviation provided that the noise is zero-mean. These measurement noise parameters are summarized in Table \ref{table:sensorNoise}.
 
 \begin{table}[h!]
  \centering
@@ -237,8 +237,7 @@ A sensor was selected for each measured state, cart position and pole anglular v
  \caption{System measurement noise characteristics.}
  \label{table:sensorNoise}
  \end{table}
-If a real cart-pole system was built using the parameters in Table \ref{table:paramvalues}, one must simply look at the assumptions in Section \ref{section:systemDescription} to see that there are many potential sources of error. These sources of error could easily be justified as disturbances, otherwise known as process noise, which is a distribution of possible outcomes for the states of the system. Given that this project focuses entirely on simulation data, a method had to be developed for introducing process noise to the system. The method selected for this project was to inject process noise by assuming it came in through the system input. Therefore, an initial value of $\sigma_{w}^2=0.0004$ was selected (See Appendix \ref{appendix:processNoise} for details on how a value was quantified). \\
-The process and measurement noise assumptions listed above can be summarized as
+If a real cart-pole system was built using the parameters in Table \ref{table:paramvalues}, one must simply look at the assumptions in Section \ref{section:systemDescription} to see that there are many potential sources of error. These sources of error could easily be justified as disturbances, otherwise known as process noise, which is a distribution of possible outcomes for the states of the system. Given that this project focuses entirely on simulation data, a method had to be developed for introducing process noise to the system. The method selected for this project was to inject process noise by assuming it came in through the system input. Therefore, an initial value of $\sigma_{w}^2=0.0004$ was selected (See Appendix \ref{appendix:processNoise} for details on how a value was quantified). The process and measurement noise assumptions listed above can be summarized as:
 \begin{equation}
 \begin{aligned}
 \matr{w}_k &\sim \matr{N}\left(\begin{bmatrix}
@@ -264,8 +263,7 @@ The process and measurement noise assumptions listed above can be summarized as
 
 \section{Estimators and Resulting Discretized State Space Models}
 \subsection{Kalman Filter (KF)}
-*Note best linear estimator
-In order to implement a linear Kalman Filter, we will need to linearize these equations. Since the unstable portion of the system is directly related to the angle of the pole, it is our desire to keep the pole at the vertical position of 0$^\circ$. Therefore, this angle is the one about which we want to linearize; this is often called a "small angle approximation." This first-order truncation of the trigonometric Taylor series expansions results in the following substitutions to our nonlinear equations:
+The Kalman Filter (KF) is the best linear estimator for nonlinear systems, and in order to implement it for a nonlinear system, the equations must be linearized. The control objective is to maintain the center of mass directly over the pivot point, which corresponds to a vertical position defined as $\theta$ = 0$^\circ$. Therefore, this is the angle about which to linearize; this is often called a "small angle approximation." This first-order truncation of the trigonometric Taylor series expansions results in the following substitutions to the nonlinear equations:
 \begin{align*}
 \sin \theta &\approx \theta \\
 \cos \theta &\approx 1 \\
@@ -301,15 +299,14 @@ where,
 \gamma &= J(M+m)+mMl^2 \\
 J &= \frac{1}{3}ml^2
 \end{align*}
-This equation, when placed alongside the output equation (Equation \ref{eq:1output}), is a representation of the familiar linear state-space form
+This equation, when placed alongside the output equation (Equation \ref{eq:1output}), is a representation of the familiar linear state-space form:
 \begin{equation*}
 \begin{aligned}
-\matr{\dot{x}} &= \matr{A}\matr{x} + \matr{B}u \\
+\matr{\dot{x}} &= \matr{A}\matr{x} + \matr{B}\matr{u} \\
 \matr{y} &= \matr{C}\matr{x}
 \end{aligned}
 \end{equation*}
-
-After substituting the parameter values and discretizing the model\footnote{The Matlab function expm() was used to convert \textbf{A\textsubscript{c}} to \textbf{A} using the appropriate equation and \textbf{B\textsubscript{c}} to \textbf{B}. The MATLAB function c2d() was also used to confirm our results.}, 
+After substituting the parameter values and discretizing the model\footnote{The MATLAB function expm() was used to convert \textbf{A\textsubscript{c}} to \textbf{A} using the appropriate equation and \textbf{B\textsubscript{c}} to \textbf{B}. The MATLAB function c2d() was also used to confirm our results.}, 
 the resulting Discretized Linear State Space Model is:
 
 \begin{equation}
@@ -342,8 +339,8 @@ x_{k} \\
 F
 \label{eq:linear_discrete}
 \end{equation}
-\subsubsection{Stability Analysis}
-The intuition that the system is unstable can be verified by checking the stability criterion
+\subsubsection{Stability, Controllability, Observability, and Detectability Analysis}
+The intuition that the system is unstable can be verified by checking the stability criterion,
 \begin{equation}
 |\vec{\lambda}(\matr{A})| < \vec{1}
 \end{equation}
@@ -404,13 +401,13 @@ num &= mgl\sin\theta_k - \frac{ml}{M+m} F\cos\theta_k -\frac{m^2l^2}{M+m}\dot{\t
 den &= \frac{4}{3}ml^2-\frac{m^2l^2}{M+m}\cos^2 \theta_k
 \end{align*}
 and all references to state variables from time step $k$ are inserted from the $k-1$ previous time step estimate.
-Using Equation \ref{eq:jacobian_EKF}, the \textit{a priori} covariance update, $\matr{P}_{k|k-1}$, is computed as
+Using Equation \ref{eq:jacobian_EKF}, the \textit{a priori} covariance update, $\matr{P}_{k|k-1}$, is computed as:
 \begin{equation}
 \matr{P}_{k|k-1} = \matr{A}'_{k-1} \matr{P}_{k-1|k-1} {\matr{A}'}_{k-1}^T + \matr{Q}
 \end{equation}
 The rest of the algorithm follows the same process as the linear Kalman Filter.\footnote{Although it is not true in general that the EKF measurement update follows the same process as KF, the absence of nonlinearities in the system output equation, along with unity coefficients (no scaling) on the process and measurement noise, results in the EKF \textit{a posteriori} estimate following exactly the KF \textit{a posteriori} algorithm.}
 \subsection{Unscented Kalman Filter (UKF)}
-When the nonlinearity of a dynamic model is severe, the state estimations propagated through linearized model will not be accurate. Though EKF incorporates a nonlinear model in model prediction, it still uses a local linearized dynamic model ${\matr{A}'}$ to estimate the variance matrix $\matr{P}_{k|k}$ at each time step. However, the Unscented Kalman Filter (UKF) has been shown to have better accuracy of the mean and the variance of state estimation compared to the EKF, especially in severely nonlinear dynamic models. In the UKF, the mean and the variance are estimated based on a sampling method. The implementation of the UKF for this project was based on a paper by Moireau and Chapelle \cite{moireau2011reduced}. In model prediction, 2n sample points were selected ($\sigma$ points) based on the current knowledge of the state estimation $\matr{\hat{X}_{k-1|k-1}}$ and $\matr{\hat{P}_{k-1|k-1}}$. The 2n sampling points are shown in Equations \ref{eq:UKF1} and \ref{eq:UKF2}.
+When the nonlinearity of a dynamic model is severe, the state estimations propagated through linearized model will not be accurate. Though EKF incorporates a nonlinear model in model prediction, it still uses a local linearized dynamic model ${\matr{A}'}$ to estimate the variance matrix $\matr{P}_{k|k-1}$ at each time step. However, the Unscented Kalman Filter (UKF) has been shown to have better accuracy of the mean and the variance of state estimation compared to the EKF, especially in severely nonlinear dynamic models \cite{simon}. In the UKF, the mean and the variance are estimated based on a sampling method. The implementation of the UKF for this project was based on a paper by Moireau and Chapelle \cite{moireau2011reduced}. In model prediction, 2n sample points were selected ($\sigma$ points) based on the current knowledge of the state estimation $\matr{\hat{X}}_{k-1|k-1}$ and $\matr{\hat{P}}_{k-1|k-1}$. The 2n sampling points are shown in Equations \ref{eq:UKF1} and \ref{eq:UKF2}.
 \begin{equation}
 	\hat{\matr{X}}^{(i)}_{k-1|k-1}+(\sqrt{n\matr{P}_{k-1|k-1}}),\  i=1,2,...n
 \label{eq:UKF1}
@@ -421,14 +418,14 @@ When the nonlinearity of a dynamic model is severe, the state estimations propag
 \end{equation}
 The nonlinear discrete model from Equation \ref{eq:nonlinear_discrete} is used to propagate each $\sigma$ points to get the state estimations $\hat{X}_{k|k-1}$. Then the mean and the variance of propagated sample points are calculated to obtain $\hat{\matr{X}}_{k|k-1}$ and $\hat{\matr{P}}_{k|k-1}$ using Equations \ref{eq:UKF3} and \ref{eq:UKF4}.
 \begin{equation}
- \hat{\matr{X}}_{k|k-1}=\frac{1}{2n}\sum_{i}^{2n}\hat{\matr{X}^{(i)}_{k|k-1}}
+ \hat{\matr{X}}_{k|k-1}=\frac{1}{2n}\sum_{i}^{2n}\hat{\matr{X}}^{(i)}_{k|k-1}
 \label{eq:UKF3}
 \end{equation}
 \begin{equation}
-\hat{\matr{P}}_{k|k-1}=\frac{1}{2n}\sum_{i}^{2n}(\hat{\matr{X}^{(i)}_{k|k-1}}-\hat{\matr{X}_{k|k-1}})(\hat{\matr{X}^{(i)}_{k|k-1}}-\hat{\matr{X}_{k|k-1}})^T + \matr{Q}_{k-1}
+\hat{\matr{P}}_{k|k-1}=\frac{1}{2n}\sum_{i}^{2n}(\hat{\matr{X}}^{(i)}_{k|k-1}-\hat{\matr{X}}_{k|k-1})(\hat{\matr{X}}^{(i)}_{k|k-1}-\hat{\matr{X}}_{k|k-1})^T + \matr{Q}_{k-1}
 \label{eq:UKF4}
 \end{equation}
-Notice that the estimation of process noise is still added at each step of model prediction. Therefore the variance will not converge for open loop estimation. The measurement update follows steps similar to the unscented transformation in model prediction, but uses the measurement function $h_k(x)$ to propagate 2n $\sigma$ points to obtain 2n estimated measurement points using the output state space function. Then the mean, variance $\matr{P}_y+\matr{R}_k$ and covariance $\matr{P}_{xy}$ of transformed $\sigma$ points are calculated.  The posterior state estimation can then be obtained from Equations \ref{eq:UKF5} and \ref{eq:UKF6}.
+Notice that the estimation of process noise is still added at each step of model prediction. Therefore the variance will not converge for open loop estimation. The measurement update follows steps similar to the unscented transformation in model prediction, but uses the measurement function $h_k(x)$ to propagate 2n $\sigma$ points to obtain 2n estimated measurement points using the output state space function. Then the mean, variance, $\matr{P}_y+\matr{R}_k$, and covariance, $\matr{P}_{xy}$, of transformed $\sigma$ points are calculated.  The posterior state estimation can then be obtained from Equations \ref{eq:UKF5} and \ref{eq:UKF6}.
 \begin{equation}
 	\hat{\matr{X}}_{k|k} = 	\hat{\matr{X}}_{k|k-1} + \matr{P}_{xy} \matr{P}^{-1}_{y}(\matr{y_k}-\hat{\matr{y}}_{k|k-1})
 \label{eq:UKF5}
@@ -438,16 +435,16 @@ Notice that the estimation of process noise is still added at each step of model
 \label{eq:UKF6}
 \end{equation}
 \section{Methodology and Test Cases} 
-The general system architecture of an inverted pendulum is shown as a block diagram in Figure \ref{fig:block_diagram}. Given the initial state $X_0$, the LQR (Linear Quadratic Regulator) controller  calculates the optimal input force, $F_1$, to inverted pendulum system for the current time step. The system responds to the input and output actual state $\matr{X}_1$ at next time step. The sensor measurement will output state measurements, $\matr{y}_1$, that include noise. The input, $F_1$, and measurements, $\matr{y}_1$, are used as inputs to estimator and then the output estimated states, $\matr{\hat{X}}_2$, are given to controller to calculate optimal input, $F_2$, in time step $t_2$.  The controller will calculate the optimal force only based on estimated states. The controller parameters are not tuned for different estimators in order to show the performance of different estimators in the real time system. 
+The general system architecture of an inverted pendulum is shown as a block diagram in Figure \ref{fig:block_diagram}. Given the initial state $\matr{X}_0$, the LQR (Linear Quadratic Regulator) controller  calculates the optimal input force, $F_1$, to inverted pendulum system for the current time step. The system responds to the input and output actual state $\matr{X}_1$ at next time step. The sensor measurement will output state measurements, $\matr{y}_1$, that include noise. The input, $F_1$, and measurements, $\matr{y}_1$, are used as inputs to estimator and then the output estimated states, $\matr{\hat{X}}_2$, are given to controller to calculate optimal input, $F_2$, in time step $t_2$.  The controller will calculate the optimal force only based on estimated states. The controller parameters are not tuned for different estimators in order to show the performance of different estimators in the real time system. 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=10cm,keepaspectratio]{SystemArchitecture.png}
 	\caption{Block diagram of our system}
 	\label{fig:block_diagram}
 \end{figure}
-
+\FloatBarrier
 \subsection{Simulation description}
-The purpose of the simulator is to generate ground truth (i.e. actual states), input, and measurement data for use in offline test cases, as well as for online comparison of estimators.  For the offline test cases, all the estimators recieve the same input and allows a more direct comparison. The simulator used in this project is based on the general system architecture (See Figure \ref{fig:block_diagram}) and contains modifications (See Appendix xx).  The simulation is modeled from a simulator in OpenAI Gym \cite{OpenAI}. The parameters of the system and input constraints were modified to reflect an actual inverted pendulum system \cite{lab6}. Process noise and measurement noise are also included based on the analysis discussed in Section \ref{ssecsensornoise}.  The animation produced by the simulator is shown in Figure \ref{fig:simulator}.
+The purpose of the simulator is to generate ground truth (i.e. actual states), input, and measurement data for use in offline test cases, as well as for online comparison of estimators.  For the offline test cases, all the estimators recieve the same input and allows a more direct comparison. The simulator used in this project is based on the general system architecture (See Figure \ref{fig:block_diagram}) and contains modifications (See Appendix \ref{simdetails}).  The simulation is modeled from a simulator in OpenAI Gym \cite{OpenAI}. The parameters of the system and input constraints were modified to reflect an actual inverted pendulum system \cite{lab6}. Process noise and measurement noise are also included based on the analysis discussed in Section \ref{ssecsensornoise}.  The animation produced by the simulator is shown in Figure \ref{fig:simulator}.
 \begin{figure}
 	\centering
 	\includegraphics[width=10cm,keepaspectratio]{Simulator.jpg}
@@ -531,20 +528,20 @@ With two sensor measurements, both the Kalman Filter (KF) and the Extended Kalma
 As seen in Figure \ref{fig:onlineKFvsEKF}, the EKF works well, but the KF performs poorly and demonstrates high linearity error.
 
 \subsubsection{Summary of Starting Pole Angle Limits for Successful Online Application}
-Several online test cases were conducted to determine the largest starting pole angle across the estimators\footnote{The output is limited to represent force saturation, which restricts the ability of the controller to accomodate all possible starting pole angles.}. Table \ref{table:offlinecases} summarizes the results and shows that two sensors enable larger starting pole angles than a single sensor.  The nonlinear estimators can accomodate larger staring pole angles than the KF.  In the cases with a single sensor, none of the estimators coudl provide sufficiently accurate state estimation to the controller with the selected sensor.  It was possible to make a single sensor feasible by increasing the sensor accuracy.
+Several online test cases were conducted to determine the largest starting pole angle across the estimators\footnote{The output is limited to represent force saturation, which restricts the ability of the controller to accomodate all possible starting pole angles.}. Table \ref{table:onlinecases} summarizes the results and shows that two sensors enable larger starting pole angles than a single sensor.  The nonlinear estimators can accomodate larger staring pole angles than the KF.  In the cases with a single sensor, none of the estimators coudl provide sufficiently accurate state estimation to the controller with the selected sensor.  It was possible to make a single sensor feasible by increasing the sensor accuracy.
 \begin{table}[h!]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{ |l |c  |c |c | c|}
 		\hline
 		\multirow{2}{*}{\textbf{Estimators}} & \multicolumn{2}{|c|}{\textbf{One Measurement}} & \multicolumn{2}{|c|}{\textbf{Two Measurements}} \\ \cline{2-5}
-		& $\sigma = 0.02$ & $\sigma=0.004$(self tuning) & $\hat{Q} = Q$ & $\hat{Q} = 0.001Q$ \\ \hline
+		& $\sigma = 0.02$ & $\sigma=0.004$ & $\hat{Q} = Q$ & $\hat{Q} = 0.001Q$ \\ \hline
 		\textbf{KF} & None & $10^\circ{}$ & $60^\circ{}$ & $45^\circ{}$ \\ \hline
 		\textbf{EKF} & None & $30^\circ{}$ & $63^\circ{}$ & $63^\circ{}$ \\ \hline
 		\textbf{UKF} & None & $30^\circ{}$ & $63^\circ{}$ & $63^\circ{}$ \\ \hline
 	\end{tabular}
 	\caption{Largest Starting Pole Angle for Various Online Test Cases and Estimators}
-	\label{table:offlinecases}
+	\label{table:onlinecases}
 \end{table}
 
 
@@ -579,8 +576,8 @@ Overall, the project results supported the initial hypotheses and the estimators
 \pagebreak
 \section{Appendices}
 \subsection{Controllability and Observability}\label{appendix:ctrb_obsv}
-\label%latex
-To check observability $\mathcal{O}$ and controllability $\mathcal{C}$, we constructed their respective matrices from the linear discrete time state space model using
+
+To check observability $\mathcal{O}$ and controllability $\mathcal{C}$, we constructed their respective matrices from the linear discrete time state space model using:
 \begin{equation}
 \mathcal{C} = \begin{bmatrix}
 B & AB & A^2B & A^3B
@@ -591,9 +588,7 @@ B & AB & A^2B & A^3B
    -0.0456  & -0.0461  & -0.0471   &-0.0485
 \end{bmatrix}
 \end{equation}
-A quick check with MATLAB using the command rank($\mathcal{C}$) tells us $\mathcal{C}$ is rank(4), which by the textbook definition makes this system controllable. \\
-
-Our initial attempt at using a Kalman filter with just one measurement (cart position) was not working very well. We then determined to check the observability matrix $\mathcal{O}$, defined as
+A quick check with MATLAB using the command rank($\mathcal{C}$) tells us $\mathcal{C}$ is rank(4), which by the textbook definition makes this system controllable \cite{simon}. The initial attempt at using a Kalman filter with just one measurement (cart position) was not working very well. It was then determined to check the observability matrix $\mathcal{O}$, defined as:
 \begin{equation}
 \mathcal{O} = \begin{bmatrix}
 C \\
@@ -602,43 +597,42 @@ CA^2 \\
 CA^3
 \end{bmatrix}
 \end{equation}
-
-This matrix was also full rank, which was perplexing. Professor Lin then suggested that we check the condition number of the observability matrix. Using the MATLAB command cond(), we evaluated cond($\mathcal{O}$) = $6.67e+5$, which suggests that the observability matrix is almost singular. I think you and Sarah need to collaborate for the This was the source of some of our problems in implementing our state estimators. Based on this information, we attempted to add another sensor at the pole angular rate. After doing this, the condition number of the observability matrix was $60.437$, a much more reasonable number.
+This matrix was also full rank, which was perplexing. Professor Lin suggested checking the condition number of the observability matrix. Using the MATLAB command cond(), the result was cond($\mathcal{O}$) = $6.67e+5$, which suggests that the observability matrix is almost singular. This was the source of some of the problems in implementing the state estimators with a single sensor. Based on this information, another sensor was added for the pole angular rate. After doing this, the condition number of the observability matrix was $60.437$, a much more reasonable number.
 \subsection{Details of Process Noise}\label{appendix:processNoise}
-Process noise was injected to the system through the input force. A motor model was constructed and with constant, linear coefficients of system variables. From this model,the input force was assumed to follow a linear relation with controlling voltage of motor circuit shown as Figure \ref{fig:circuit}.
+Process noise was injected to the system through the input force. A motor model was constructed with constant, linear coefficients of system variables. From this model,the input force was assumed to follow a linear relation with controlling voltage of motor circuit shown as Figure \ref{fig:circuit}.
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=10cm,keepaspectratio]{circuit.png}
-	\caption{controlling circuit of motors}
+	\caption{Motor Circuit Diagram}
 	\label{fig:circuit}
 \end{figure}
-The linear relationship between force noise and motor voltage input noise\footnote{A value for $\alpha$ was selected based on small motors comparable to what would be required for a small cart-pole robot. \cite{lab3} acted as a guide and assisted with construction of a motor model.} is expressed as Equation \ref{FvsV}, $\alpha \approx 1.72$. It was assumed that the motor driver operates and 12 Volts and with a 10 bit DAC accuracy. By this analysis, the standard deviation $\sigma$ of the input noise can be approximated as $\alpha\frac{12}{2^{10}}$ = 0.02.
+The linear relationship between force noise and motor voltage input noise\footnote{A value for $\alpha$ was selected based on small motors comparable to what would be required for a small cart-pole robot. A lab acted as a guide and assisted with construction of a motor model \cite{lab3}.} is expressed as Equation \ref{FvsV}, $\alpha \approx 1.72$ (Value from \cite{lab3}). It was assumed that the motor driver operates at 12 Volts and with a 10 bit DAC accuracy. By this analysis, the standard deviation $\sigma$ of the input noise can be approximated as $\alpha\frac{12}{2^{10}}$ = 0.02.
 \begin{equation}
 F = \alpha V + B
 \label{FvsV}
 \end{equation}
-\subsection{Details of Controller}
-In simulator, we use a discretized Linear Quadratic Regulator to output desired force at each time step. The idea is to use dynamic programming methodology to do backward recursion calculation starting from final position we want to get. At each step, with linear constraint and quadratic objective function, the desired force can be calculated by gradient method. Then the controller will choose first step of calculated force as input of system at current time step. The calculation for loop is shown in Figure \ref{fig:iLQR} \cite{puterman2014markov}.
+\subsection{Details of the Controller}
+In simulation, a discretized Linear Quadratic Regulator was used to output desired force at each time step. The idea is to use dynamic programming methodology to perform backward recursion calculations starting from the final desired position. At each step, using the linear constraint and quadratic objective function, the desired force can be calculated by a gradient method. Then the controller will choose first step of calculated force as input of system at current time step. The calculation for loop is shown in Figure \ref{fig:iLQR}.
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=15cm,keepaspectratio]{LQR.png}
-	\caption{iterative Linear Quadratic Regulator (iLQR)}
+	\caption{Iterative Linear Quadratic Regulator (iLQR) (From \cite{puterman2014markov})}
 	\label{fig:iLQR}
 \end{figure}
-\subsection{Discussion of Simulation Environment, Online versus Offline}
+\subsection{Discussion of Simulation Environment, Online versus Offline}\label{simdetails}
+The method of simulation can be ascertained by a study of Figure \ref{fig:simulation}. The offline ground truth data was generated by inserting parameters and initial conditions to the Python OpenAI Gym package \cite{OpenAI}. Then, this data was loaded into MATLAB for offline estimator performance comparison. 
+
+It was important to perform both offline and online estimation for several reasons. First, solely performing online estimation does not provide the designer with sufficient details regarding how and when state estimation errors become significant. Also, solely performing offline estimatoin doesn't paint a complete picture. Online performance of the linear KF was better than predictions based on offline estimators.
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=10cm,keepaspectratio]{Simulation.png}
-	\caption{High-level overview of simulation environment}
+	\includegraphics[width=17cm,keepaspectratio]{Simulation.png}
+	\caption{High-level Overview of Simulation Environment}
 	\label{fig:simulation}
 \end{figure}
-The method of simulation can be ascertained by a study of Figure \ref{fig:simulation}. The offline ground truth data was generated by inserting parameters and initial conditions to the Python OpenAI Gym package. Then, this data was loaded into MATLAB for offline estimator performance comparison. \\
-
-It was important to perform both offline and online estimation for several reasons. First, solely performing online estimation does not provide the designer with sufficient details regarding how and when state estimation errors become significant. Also, solely performing offline estimatoin doesn't paint a complete picture. Online performance of the linear KF was better than predictions based on offline estimators. \\
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=10cm,keepaspectratio]{NoForcingOpen.png}
-	\caption{Kalman Filter estimation of pole angle for a small initial angle and no input force}
+	\caption{Kalman Filter Estimation of Pole Angle for a Small Initial Angle and No Input Force}
 	\label{fig:NoForcing}
 \end{figure}
 
