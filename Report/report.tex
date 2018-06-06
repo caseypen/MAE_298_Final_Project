@@ -156,13 +156,9 @@ A_{1} =
  This project used a pole on a cart model as an inverted pendulum system and investigated the use of different estimators: the Kalman Filter (KF), the Extended Kalman Filter, and the Unscented Kalman Filter.  Since the KF is used for linearized systems, it is hypothesized that its performance will degrade at larger angles as the small angle approximation will be used to linearize the equations of motion.  The project also tested the use of a single sensor and two sensors, and it is expected that two sensors will yield a more accurate estimation of the states.  Finally, this project evaluated the RMSE (root mean square error) and run time across estimators (KF, EKF, UKF) with different tuning.  The following sections discuss the system, state space models, test cases, results, and conclusions.
 
 \section{Derivation of Continuous State Space Model}
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=5cm,keepaspectratio]{SystemDiagram.png}
-	\caption{System Diagram}
-	\label{fig:sys_diagram}
-\end{figure}
-The model used for our analysis is a 2 degree-of-freedom system. It includes a rigid pole that has a single axis of rotation, and is attached to the cart with a pin-joint. The cart has a single translational axis corresponding to the ground plane. The underlying assumptions of this model are:
+
+The model used for our analysis is a 2 degree-of-freedom system (see Figure \ref{fig:sys_diagram}). It includes a rigid pole that has a single axis of rotation, and is attached to the cart with a pin-joint. The cart has a single translational axis corresponding to the ground plane. The underlying assumptions of this model are:
+
 \begin{enumerate}
 \item No friction between the ground and the cart wheels
 \item No friction between cart and pole
@@ -171,6 +167,14 @@ The model used for our analysis is a 2 degree-of-freedom system. It includes a r
 \item Cart remains in contact with the ground
 \item Ground is flat and level
 \end{enumerate}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=5cm,keepaspectratio]{SystemDiagram.png}
+	\caption{System Diagram}
+	\label{fig:sys_diagram}
+\end{figure}
+
  Using the above assumptions, we derived the non-linear equations of motion using Newton's second law.
 \begin{equation}
 \begin{aligned}
