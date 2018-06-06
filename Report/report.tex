@@ -430,7 +430,7 @@ The comparison varying the number of sensors was restricted to the KF because th
  	\label{fig:sensorsKF}
  \end{figure}
  
- The next test case compared the use of linear (KF) and nonlinear estimators (EKF) for a small starting pole angle ($\theta$ = 5$^{\circ}$).  As seen in Figure \ref{fig:5degKFvEKF}
+ The next test case compared the use of linear (KF) and nonlinear estimators (EKF) for a small starting pole angle ($\theta$ = 5$^{\circ}$).  As seen in Figure \ref{fig:5degKFvEKF}, the EKF follows the ground truth closer than the KF and the difference is likely due to the linearization errors in the KF.  The performance of the KF is relatively close to the EKF, as their RMSE is the same order of magnitude, 9.86 x 10$^{-4}$ and 3.10 x 10$^{-4}$, respectively.
  \begin{figure}[h!]
  	\centering
  	\includegraphics[width=15cm,keepaspectratio]{5degKFvEKF.png}
