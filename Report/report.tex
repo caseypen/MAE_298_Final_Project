@@ -454,6 +454,15 @@ The comparison varying the number of sensors was restricted to the KF because th
  \label{table:rmse}
  \end{table}
  
+ The final offline test case used a large pole starting angle ($\theta$ = 60$^{\circ}$), which was well beyond the expected limits of the KF.
+  \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width=15cm,keepaspectratio]{offline60deg.png}
+ 	\caption{Comparison of KF, EKF and UKF (Pole starting angle = 60$^{\circ}$, Scaling = 0.001Q). \textbf{A} Estimation of pole angle \textbf{B} Error distribution}
+ 	\label{fig:offline60deg}
+ \end{figure}
+
+
 \subsection{Online Results}
 \subsubsection{KF, EKF for large angles}
 With two sensor measurements, both KF and EKF work fine to stabilize the system around equilibrium position. However, if we decrease estimation of process noise estimation Q, which means to trust dynamic model more in estimation, we found that KF will not generate desired estimates to make the controller come to stable position. The online running result for KF and EKF is shown in Figure \ref{fig:onlineKFvsEKF}. 
