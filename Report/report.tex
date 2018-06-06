@@ -599,19 +599,19 @@ CA^3
 
 This matrix was also full rank, which was perplexing. Professor Lin then suggested that we check the condition number of the observability matrix. Using the MATLAB command cond(), we evaluated cond($\mathcal{O}$) = $6.67e+5$, which suggests that the observability matrix is almost singular. I think you and Sarah need to collaborate for the This was the source of some of our problems in implementing our state estimators. Based on this information, we attempted to add another sensor at the pole angular rate. After doing this, the condition number of the observability matrix was $60.437$, a much more reasonable number.
 \subsection{Details of Process Noise}\label{appendix:processNoise}
-For our system, we inject the process noise from input of system. We assume the input force follows a linear relation with controlling voltage of motor circuit shown as Figure \ref{fig:circuit}.
+Process noise was injected to the system through the input force. A motor model was constructed and with constant, linear coefficients of system variables. From this model,the input force was assumed to follow a linear relation with controlling voltage of motor circuit shown as Figure \ref{fig:circuit}.
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=10cm,keepaspectratio]{circuit.png}
 	\caption{controlling circuit of motors}
 	\label{fig:circuit}
 \end{figure}
-The linear relationship between force and voltage is expressed as Equation \ref{FvsV}, $\alpha \approx 1.72$ \cite{lab3}. We assume the H bridge with rated output, 12 Volts and 10 bit PWM accuracy. So the standard deviation of input noise can be approximated as 0.02.
+The linear relationship between force noise and motor voltage input noise\footnote{A value for $\alpha$ was selected based on small motors comparable to what would be required for a small cart-pole robot. \cite{lab3} acted as a guide and assisted with construction of a motor model.} is expressed as Equation \ref{FvsV}, $\alpha \approx 1.72$. It was assumed that the motor driver operates and 12 Volts and with a 10 bit DAC accuracy. By this analysis, the standard deviation $\sigma$ of the input noise can be approximated as $\alpha\frac{12}{2^{10}}$ = 0.02.
 \begin{equation}
 F = \alpha V + B
 \label{FvsV}
 \end{equation}
-\subsection{Details of controller}
+\subsection{Details of Controller}
 In simulator, we use a discretized Linear Quadratic Regulator to output desired force at each time step. The idea is to use dynamic programming methodology to do backward recursion calculation starting from final position we want to get. At each step, with linear constraint and quadratic objective function, the desired force can be calculated by gradient method. Then the controller will choose first step of calculated force as input of system at current time step. The calculation for loop is shown in Figure \ref{fig:iLQR} \cite{puterman2014markov}.
 \begin{figure}[h!]
 	\centering
