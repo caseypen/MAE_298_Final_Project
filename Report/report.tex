@@ -409,7 +409,6 @@ The whole simulation running based on discretized nonlinear system following Equ
 \subsection{Offline Results}
 
 The offline test cases were constructed to evaluate linear and nonlinear estimator performance for various conditions regarding the number of sensor measurements, starting pole angle and tuning.
-
 \begin{table}[h!]
  \centering
  \renewcommand{\arraystretch}{1.5}
@@ -423,7 +422,13 @@ The offline test cases were constructed to evaluate linear and nonlinear estimat
  \caption{Offline Test Cases}
  \label{table:offlinecases}
  \end{table}
-
+The comparison varying the number of sensors was restricted to the KF because the results made it clear that a signle sensor had poor performance, as seen in Figure \ref{fig:sensorsKF}
+\begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width=10cm,keepaspectratio]{SensorsKF.png}
+ 	\caption{Comparison of KF Results for a Single Sensor and Two Sensors (Pole starting angle = 5$^{\circ}$, Scaling = Q)}
+ 	\label{fig:sensorsKF}
+ \end{figure}
 \subsection{Online Results}
 
 \section{Conclusions}
