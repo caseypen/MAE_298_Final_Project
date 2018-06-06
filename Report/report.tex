@@ -280,7 +280,7 @@ This equation, when placed alongside the output equation (Equation \ref{eq:1outp
 \end{aligned}
 \end{equation*}
 
-After substituting the parameter values and discretizing the model\footnote{The Matlab function expm() was used to convert \textbf{A\textsubscript{c}} to \textbf{A} using the appropriate equation and \textbf{B\textsubscript{c}} to \textbf{B}. }, 
+After substituting the parameter values and discretizing the model\footnote{The Matlab function expm() was used to convert \textbf{A\textsubscript{c}} to \textbf{A} using the appropriate equation and \textbf{B\textsubscript{c}} to \textbf{B}. The MATLAB function c2d() was also used to confirm our results.}, 
 the resulting Discretized Linear State Space Model is:
 
 \begin{equation}
@@ -313,10 +313,7 @@ x_{k} \\
 F
 \label{eq:linear_discrete}
 \end{equation}
-
-
-\subsection{Extended Kalman Filter (EKF)}
-PUT THIS ABOVE:
+\subsubsection{Stability Analysis}
 The intuition that the system is unstable can be verified by checking the stability criterion
 \begin{equation}
 |\vec{\lambda}(\matr{A})| < \vec{1}
@@ -330,8 +327,9 @@ which says that all of the eigenvalues of the system must be less than 1 for the
     0.9029
 \end{bmatrix}
 \end{equation}
-which does not meet the stibility criterion, confirming intuition.\\
-\\
+which does not meet the stibility criterion, confirming intuition.
+
+\subsection{Extended Kalman Filter (EKF)}
 The Extended Kalman Filter differs from the regular Kalman Filter by utilizing the nonlinear discrete time state equations in place of the linear equations. This is accomplished by inserting the \textit{a posteriori} estimates of the states from the previous time step into the discrete nonlinear equations to get the \textit{a priori} estimate of the states at the current time step. This necessitates that the the nonlinear discrete time equations be computed. This is accomplished using first-order Euler approximations of the continuous time versions (Equation \ref{eq:nonlinear_ss_continuous}):
 \begin{equation}
 \begin{aligned}
