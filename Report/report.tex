@@ -455,6 +455,33 @@ The comparison varying the number of sensors was restricted to the KF because th
  \end{table}
  
 \subsection{Online Results}
+\subsubsection{KF, EKF for large angles}
+With two sensor measurements, both KF and EKF work fine to stabilize the system around equilibrium position. However, if we decrease estimation of process noise estimation Q, which means to trust dynamic model more in estimation, we found that KF will not generate desired estimates to make the controller come to stable position. The online running result for KF and EKF is shown in Figure \ref{fig:onlineKFvsEKF}. 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=15cm,keepaspectratio]{EKFvsKF_online.png}
+	\caption{Online result of EKF and KF}
+	\label{fig:onlineKFvsEKF}
+\end{figure}
+
+From figure, we can find that EKF still works pretty good when we set smaller Q, however, the KF works poorly and it proves that high linearity error for KF estimator.
+\subsubsection{Successful cases working online}
+In simulation, with different estimators, starting angles and sensors, multiple experiments are running to show the online performances of estimator. In the table, the largest starting angles are searched for online experiments. We can find that two measurements can greatly improve the estimation accuracy. However, when sensor measurements are not reliable, accurate model are needed to improve the estimation accuracy.
+\begin{table}[h!]
+	\centering
+	\renewcommand{\arraystretch}{1.5}
+	\begin{tabular}{ |l |c  |c |c | c|}
+		\hline
+		\multirow{2}{*}{\textbf{Estimators}} & \multicolumn{2}{|c|}{\textbf{One Measurement}} & \multicolumn{2}{|c|}{\textbf{Two Measurements}} \\ \cline{2-5}
+		& $\sigma = 0.02$ & $\sigma=0.004$(self tuning) & $\hat{Q} = Q$ & $\hat{Q} = 0.001Q$ \\ \hline
+		\textbf{KF} & None & $10^\circ{}$ & $60^\circ{}$ & $45^\circ{}$ \\ \hline
+		\textbf{EKF} & None & $30^\circ{}$ & $63^\circ{}$ & $63^\circ{}$ \\ \hline
+		\textbf{UKF} & None & $30^\circ{}$ & $63^\circ{}$ & $63^\circ{}$ \\ \hline
+	\end{tabular}
+	\caption{Largest starting angle for various Online Test Cases and estimators}
+	\label{table:offlinecases}
+\end{table}
+
 
 \section{Conclusions}
 This project focused on 
@@ -491,7 +518,29 @@ CA^2 \\
 CA^3
 \end{bmatrix}
 \end{equation}
+
 This matrix was also full rank, which was perplexing. Professor Lin then suggested that we check the condition number of the observability matrix. Using the MATLAB command cond(), we evaluated cond($\mathcal{O}$) = $6.67e+5$, which suggests that the observability matrix is almost singular. I think you and Sarah need to collaborate for the This was the source of some of our problems in implementing our state estimators. Based on this information, we attempted to add another sensor at the pole angular rate. After doing this, the condition number of the observability matrix was $60.437$, a much more reasonable number.
+\subsection{Details of Process Noise}
+For our system, we inject the process noise from input of system. We assume the input force follows a linear relation with controlling voltage of motor circuit shown as Figure \ref{fig:circuit}.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=10cm,keepaspectratio]{circuit.png}
+	\caption{controlling circuit of motors}
+	\label{fig:circuit}
+\end{figure}
+The linear relationship between force and voltage is expressed as Equation \ref{FvsV}, $\alpha \approx 1.72$. We assume the H bridge with rated output, 12 Volts and 10 bit PWM accuracy. So the standard deviation of input noise can be approximated as 0.02.
+\begin{equation}
+F = \alpha V + B
+\label{FvsV}
+\end{equation}
+\subsection{Details of controller}
+In simulator, we use a discretized Linear Quadratic Regulator to output desired force at each time step. The idea is to use dynamic programming methodology to do backward recursion calculation starting from final position we want to get. At each step, with linear constraint and quadratic objective function, the desired force can be calculated by gradient method. Then the controller will choose first step of calculated force as input of system at current time step. The calculation for loop is shown in Figure \ref{fig:iLQR}.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=15cm,keepaspectratio]{LQR.png}
+	\caption{iterative Linear Quadratic Regulator (iLQR)}
+	\label{fig:iLQR}
+\end{figure}
 
 \end{document}
 
